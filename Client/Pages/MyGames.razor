@@ -7,16 +7,23 @@
 @if (currentUser != null)
 {
     <h3>המשחקים של  @currentUser.FirstName </h3>
+    <br />
+    <h4>משחק חדש:<input id="Text1" type="text" @bind-value="NewGame" /><input id="Button1" type="button" value="הוספת משחק" onclick="AddGame" /></h4>
+    <br />
     <MudTable Items="@currentUser.UserGames" Hover="true">
         <HeaderContent>
             <MudTh>שם המשחק</MudTh>
             <MudTh>קוד המשחק</MudTh>
+            <MudTh>עריכה</MudTh>
             <MudTh>פרסום המשחק</MudTh>
 
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="שם המשחק">@context.GameName</MudTd>
             <MudTd DataLabel="קוד המשחק">@context.GameCode</MudTd>
+            <MudTd DataLabel="עריכה">
+                <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
+            </MudTd>
             <MudTd DataLabel="פרסום המשחק">
                 <MudCheckBox CheckedChanged="@((bool newState) => PublishGame(context))" Checked="@context.IsPublish" Color="Color.Primary"></MudCheckBox>
 
@@ -35,6 +42,7 @@
 
     User currentUser;
     string msg = "";
+    string NewGame = "";
 
     protected async override Task OnInitializedAsync()
     {
