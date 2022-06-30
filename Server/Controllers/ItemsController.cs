@@ -26,5 +26,63 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
             List<Item> ItemsList = await _context.Items.ToListAsync();
             return Ok(ItemsList);
         }
+
+        [HttpPost("InsertItem")]
+        public async Task<IActionResult> AddItem(Item newItem)
+        {
+            if (newItem != null)
+            {
+                _context.Items.Add(newItem);
+                await _context.SaveChangesAsync();
+
+                return Ok(newItem);
+            }
+            else
+            {
+                return BadRequest("Item was not send");
+            }
+        }
+
+        [HttpPost("Update/{id}")]
+        public async Task<IActionResult> UpdateItem (Item ItemToUpdate)
+        {
+            Item ItemFromDB = await _context.Items.FirstOrDefaultAsync(i => i.ID == ItemToUpdate.ID);
+            if (ItemFromDB != null)
+            {
+                ItemFromDB.ItemType = ItemToUpdate.ItemType;
+                ItemFromDB.ItemContent = ItemToUpdate.ItemContent;
+                ItemFromDB.IsCorrect = ItemToUpdate.IsCorrect;
+
+                await _context.SaveChangesAsync();
+                return Ok(ItemFromDB);
+
+            }
+            else
+            {
+                return BadRequest("no such item");
+            }
+        }
+
+    [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletItem(int id)
+        {
+            Item ItemToDelete = await _context.Items.FirstOrDefaultAsync(i => i.ID == id);
+            if (ItemToDelete != null)
+            {
+                _context.Items.Remove(ItemToDelete);
+                await _context.SaveChangesAsync();
+                return Ok(true);
+            }
+            else
+            {
+                return BadRequest("no such Item");
+            }
+        }
+
+
+
+
+
+
     }
 }
