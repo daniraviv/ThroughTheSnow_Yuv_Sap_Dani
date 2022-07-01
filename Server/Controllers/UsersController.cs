@@ -27,23 +27,6 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
             return Ok(UsersList);
         }
 
-        //[HttpGet("{Id}")] // הסוגריים המסולסלים מסמנים פרמטר-שליחת ערך
-        //public async Task<IActionResult> GetUser(int Id) //מה שבסוגריים זה הפרמטר אותו השיטה תקבל 
-        //{
-        //    User myUser = await _context.Users.FirstOrDefaultAsync(u => u.ID == Id); //w -משתנה שבכל סיבוב הוא הרשומה החדשה 
-
-        //    //הכתובת תהיה  https: //localhost:5001/api/Workers/2 ואז זה יראה את מי שהID הוא 2 
-
-        //    if (myUser != null)
-        //    {
-        //        return Ok(myUser);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest("No such User");
-        //    }
-
-        //}
 
 
         [HttpGet("{mail}")]

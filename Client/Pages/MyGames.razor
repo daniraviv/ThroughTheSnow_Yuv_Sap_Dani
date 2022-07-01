@@ -8,13 +8,14 @@
 {
     <h3>המשחקים של  @currentUser.FirstName </h3>
     <br />
-    <h4>משחק חדש:<input id="Text1" type="text" @bind-value="NewGame" /><input id="Button1" type="button" value="הוספת משחק" @*@onclick="AddGame"*@ /></h4>
+    <h4>משחק חדש:<input id="Text1" type="text" @bind="newGame.GameName" /><input id="Button1" type="button" value="הוספת משחק"@onclick="CreateGame" /></h4>
     <br />
     <MudTable Items="@currentUser.UserGames" Hover="true">
         <HeaderContent>
             <MudTh>שם המשחק</MudTh>
             <MudTh>קוד המשחק</MudTh>
             <MudTh>עריכה</MudTh>
+            <MudTh>מחיקה</MudTh>
             <MudTh>פרסום המשחק</MudTh>
 
         </HeaderContent>
@@ -23,6 +24,9 @@
             <MudTd DataLabel="קוד המשחק">@context.GameCode</MudTd>
             <MudTd DataLabel="עריכה">
                 <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
+            </MudTd>
+            <MudTd DataLabel="מחיקה">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" @onclick="() => DeleteGame(context.ID)" aria-label="delete"></MudIconButton>
             </MudTd>
             <MudTd DataLabel="פרסום המשחק">
                 <MudCheckBox CheckedChanged="@((bool newState) => PublishGame(context))" Checked="@context.IsPublish" Color="Color.Primary"></MudCheckBox>
@@ -40,9 +44,12 @@
 { [Parameter]
     public int userId { get; set; }
 
+    Game currentGame;
     User currentUser;
     string msg = "";
-    string NewGame = "";
+    //string NewGame = "";
+    Game newGame = new Game();
+
 
     protected async override Task OnInitializedAsync()
     {
@@ -62,6 +69,35 @@
             {
                 msg = "שגיאת רשת";
             }
+        }
+    }
+    async Task CreateGame()
+    {
+        //newGame.UserID = currentUser.ID;
+        var postResponse = await Http.PostAsJsonAsync("api/Games/Insert", newGame);
+        if (postResponse.IsSuccessStatusCode == true)
+        {
+            Game myNewGame = postResponse.Content.ReadFromJsonAsync<Game>().Result;
+            currentUser.UserGames.Add(myNewGame);
+            newGame = new Game();
+        }
+        else
+        {
+            msg = "תקלה";
+        }
+
+    }
+
+    async Task DeleteGame(int gameToDeletId)
+    {
+        
+        var DeleteResponse = await Http.DeleteAsync("api/Games/" + gameToDeletId);
+        bool isDeleted = DeleteResponse.Content.ReadFromJsonAsync<bool>().Result;
+
+        if (isDeleted == true && DeleteResponse.IsSuccessStatusCode == true)
+        {
+            currentUser.UserGames.RemoveAll(g => g.ID == gameToDeletId);
+            currentGame = new Game();
         }
     }
 

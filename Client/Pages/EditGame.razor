@@ -1,0 +1,22 @@
+﻿@page "/EditGame"
+
+
+<h3>שם המשחק: </h3>
+<br />
+הוספת הנחייה :
+<InputText @bind-Value="question" />
+<br />
+<h3>יצירת פריטים לשאלה</h3>
+<br />
+ערך הפריט:
+    נכון <label class="switch">
+    <input type="checkbox">
+    <span class="slider"></span>
+</label> לא נכון
+
+<input id="Button2" type="button" value="הוספה" />
+
+
+@code {
+    string question = "";
+}

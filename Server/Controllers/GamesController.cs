@@ -65,37 +65,79 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
         }
 
 
+        //[HttpPost("Insert")]
+        //public async Task<IActionResult> AddGame(Game newGame)
+        //{
+        //    if (newGame != null)
+        //    {
+        //        _context.Games.Add(newGame);
+        //        await _context.SaveChangesAsync();
+
+        //        newGame.GameCode = newGame.ID + 100;
+        //        await _context.SaveChangesAsync();
+
+        //        return Ok(newGame);
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("game was not send");
+        //    }
+        //}
+
         [HttpPost("Insert")]
         public async Task<IActionResult> AddGame(Game newGame)
         {
-            if (newGame != null)
+            string sessionContent = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(sessionContent) == false) 
             {
-                _context.Games.Add(newGame);
-                await _context.SaveChangesAsync();
+                int SessionId = Convert.ToInt32(sessionContent);
+                
+                if (newGame != null)
+                {
+                    newGame.UserID = SessionId;
+                    await _context.SaveChangesAsync();
 
-                return Ok(newGame);
-            }
-            else
-            {
+                    
+                    _context.Games.Add(newGame);
+                    await _context.SaveChangesAsync();
+
+                    newGame.GameCode = newGame.ID + 100;
+                    await _context.SaveChangesAsync();
+
+
+                    return Ok(newGame);
+                }
                 return BadRequest("game was not send");
-            }
+      
+                }
+            return BadRequest("game was not send");
+
         }
+           
+        
 
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletGame(int id)
         {
-            Game GameToDelete = await _context.Games.FirstOrDefaultAsync(g => g.ID == id);
-            if (GameToDelete != null)
+            string sessionContent = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(sessionContent) == false)
             {
-                _context.Games.Remove(GameToDelete);
-                await _context.SaveChangesAsync();
-                return Ok(true);
+                int SessionId = Convert.ToInt32(sessionContent);
+              Game GameToDelete = await _context.Games.FirstOrDefaultAsync(g => g.ID == id);
+                if(SessionId== GameToDelete.UserID) 
+                {
+                    if (GameToDelete != null)
+                    {
+                        _context.Games.Remove(GameToDelete);
+                        await _context.SaveChangesAsync();
+                        return Ok(true);
+                    }
+                    return BadRequest("no such Game");
+                }
+                return BadRequest("user not log in");
             }
-            else
-            {
-                return BadRequest("no such Game");
-            }
+            return BadRequest("empty session");
         }
 
     }
