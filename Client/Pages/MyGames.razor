@@ -8,7 +8,7 @@
 {
     <h3>המשחקים של  @currentUser.FirstName </h3>
     <br />
-    <h4>משחק חדש:<input id="Text1" type="text" @bind-value="NewGame" /><input id="Button1" type="button" value="הוספת משחק" @onclick="AddGame" /></h4>
+    <h4>משחק חדש:<input id="Text1" type="text" @bind-value="NewGame" /><input id="Button1" type="button" value="הוספת משחק" @*@onclick="AddGame"*@ /></h4>
     <br />
     <MudTable Items="@currentUser.UserGames" Hover="true">
         <HeaderContent>

@@ -48,6 +48,55 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
             return BadRequest("Empty Session");
         }
 
+        [HttpGet("byCode/{gameCode}")]
+        public async Task<IActionResult> GetGameByCode(int gameCode)
+        {
+            Game gameToReturn = await _context.Games.FirstOrDefaultAsync(g => g.GameCode == gameCode);
+            if (gameToReturn != null)
+            {
+                if (gameToReturn.IsPublish == true)
+                {
+                    return Ok(gameToReturn);
+                }
+                return BadRequest("game not published");
+            }
+
+            return BadRequest("No such game");
+        }
+
+
+        [HttpPost("Insert")]
+        public async Task<IActionResult> AddGame(Game newGame)
+        {
+            if (newGame != null)
+            {
+                _context.Games.Add(newGame);
+                await _context.SaveChangesAsync();
+
+                return Ok(newGame);
+            }
+            else
+            {
+                return BadRequest("game was not send");
+            }
+        }
+
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletGame(int id)
+        {
+            Game GameToDelete = await _context.Games.FirstOrDefaultAsync(g => g.ID == id);
+            if (GameToDelete != null)
+            {
+                _context.Games.Remove(GameToDelete);
+                await _context.SaveChangesAsync();
+                return Ok(true);
+            }
+            else
+            {
+                return BadRequest("no such Game");
+            }
+        }
 
     }
 }
