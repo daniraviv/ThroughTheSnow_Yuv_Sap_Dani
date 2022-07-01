@@ -43,7 +43,7 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
             }
         }
 
-        [HttpPost("Update/{id}")]
+        [HttpPost("Update")]
         public async Task<IActionResult> UpdateItem (Item ItemToUpdate)
         {
             Item ItemFromDB = await _context.Items.FirstOrDefaultAsync(i => i.ID == ItemToUpdate.ID);
