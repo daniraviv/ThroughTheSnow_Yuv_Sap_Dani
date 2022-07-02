@@ -27,6 +27,23 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
             return Ok(ItemsList);
         }
 
+        [HttpGet("{gameid}")]
+        public async Task<IActionResult> GetGameByCode(int gameid)
+        {
+
+            Game gameToReturn = await _context.Games.Include(g => g.GameItems).FirstOrDefaultAsync(g => g.ID == gameid);
+            if (gameToReturn != null)
+            {
+
+
+                return Ok(gameToReturn);
+
+            }
+            return BadRequest("No such game");
+        }
+
+
+
         [HttpPost("InsertItem")]
         public async Task<IActionResult> AddItem(Item newItem)
         {

@@ -2,13 +2,14 @@
 @using ThroughTheSnow_Yuv_Sap_Dani.Shared.Entities
 @inject HttpClient Http
 @inject NavigationManager nav
+@inject IDialogService DialogService
 <h3>Games</h3>
 
 @if (currentUser != null)
 {
     <h3>המשחקים של  @currentUser.FirstName </h3>
     <br />
-    <h4>משחק חדש:<input id="Text1" type="text" @bind="newGame.GameName" /><input id="Button1" type="button" value="הוספת משחק"@onclick="CreateGame" /></h4>
+    <h4>משחק חדש:<input id="Text1" type="text" @bind="newGame.GameName" /><input id="Button1" type="button" value="הוספת משחק" @onclick="CreateGame" /></h4>
     <br />
     <MudTable Items="@currentUser.UserGames" Hover="true">
         <HeaderContent>
@@ -23,10 +24,10 @@
             <MudTd DataLabel="שם המשחק">@context.GameName</MudTd>
             <MudTd DataLabel="קוד המשחק">@context.GameCode</MudTd>
             <MudTd DataLabel="עריכה">
-                <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
+                <MudIconButton Icon="@Icons.Material.Outlined.Edit" @onclick="() => EditGamePage(context.GameCode)" />
             </MudTd>
             <MudTd DataLabel="מחיקה">
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" @onclick="() => DeleteGame(context.ID)" aria-label="delete"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete"@onclick="() => OpenDialog(context.ID, context.GameName)" aria-label="delete"></MudIconButton>
             </MudTd>
             <MudTd DataLabel="פרסום המשחק">
                 <MudCheckBox CheckedChanged="@((bool newState) => PublishGame(context))" Checked="@context.IsPublish" Color="Color.Primary"></MudCheckBox>
@@ -44,11 +45,14 @@
 { [Parameter]
     public int userId { get; set; }
 
+
+
     Game currentGame;
     User currentUser;
     string msg = "";
     //string NewGame = "";
     Game newGame = new Game();
+
 
 
     protected async override Task OnInitializedAsync()
@@ -88,9 +92,25 @@
 
     }
 
-    async Task DeleteGame(int gameToDeletId)
+    async Task OpenDialog(int GameId, string gameName)
     {
-        
+        var parameters = new DialogParameters();
+        parameters.Add("contentText", "האם אתה בטוח שתרצה למחוק את " + gameName + "?");
+        var options = new DialogOptions {};
+        var diag = DialogService.Show<DeleteGame>("האם אתה בטוח שתרצה למחוק את " + gameName + "?", options);
+        var result = await diag.Result;
+        if (result != null)
+        {
+            if (!result.Cancelled)
+            {
+                await DeleteGameCallback(GameId);
+            }
+        }
+    }
+
+    async Task DeleteGameCallback(int gameToDeletId)
+    {
+
         var DeleteResponse = await Http.DeleteAsync("api/Games/" + gameToDeletId);
         bool isDeleted = DeleteResponse.Content.ReadFromJsonAsync<bool>().Result;
 
@@ -101,8 +121,42 @@
         }
     }
 
+    async Task EditGamePage(int GameCode)
+    {
+
+        // קריאה לקוטרולר
+        var nextPage = await Http.GetAsync("api/Games/byCode/" + GameCode);
+
+        if (nextPage.IsSuccessStatusCode == true)
+        {
+            int gameid = nextPage.Content.ReadFromJsonAsync<int>().Result;
+            // פנייה לעמוד גיימז שהכתובת שלו היא של המשתמש שהוזן
+            nav.NavigateTo("./Items/" + gameid);
+
+            // אין צורך לשלוח הודעה כי המשתמש מופנה לדף
+            //msg = "login worked";
+        }
+
+        else
+        {
+            msg = "login failed";
+        }
+    }
+
+
+
+
+
+
+
+
     void PublishGame(Game selectedGame)
     {
         selectedGame.IsPublish = !selectedGame.IsPublish;
     }
+
+
+
+
+
 }

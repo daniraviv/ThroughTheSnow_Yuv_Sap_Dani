@@ -56,7 +56,7 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
             {
                 if (gameToReturn.IsPublish == true)
                 {
-                    return Ok(gameToReturn);
+                    return Ok(gameToReturn.ID);
                 }
                 return BadRequest("game not published");
             }
@@ -65,24 +65,7 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
         }
 
 
-        //[HttpPost("Insert")]
-        //public async Task<IActionResult> AddGame(Game newGame)
-        //{
-        //    if (newGame != null)
-        //    {
-        //        _context.Games.Add(newGame);
-        //        await _context.SaveChangesAsync();
-
-        //        newGame.GameCode = newGame.ID + 100;
-        //        await _context.SaveChangesAsync();
-
-        //        return Ok(newGame);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest("game was not send");
-        //    }
-        //}
+      
 
         [HttpPost("Insert")]
         public async Task<IActionResult> AddGame(Game newGame)
@@ -124,18 +107,20 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
             if (string.IsNullOrEmpty(sessionContent) == false)
             {
                 int SessionId = Convert.ToInt32(sessionContent);
-              Game GameToDelete = await _context.Games.FirstOrDefaultAsync(g => g.ID == id);
-                if(SessionId== GameToDelete.UserID) 
+                Game GameToDelete = await _context.Games.FirstOrDefaultAsync(g => g.ID == id);
+                if (GameToDelete != null)
                 {
-                    if (GameToDelete != null)
+                    if (SessionId == GameToDelete.UserID)
                     {
                         _context.Games.Remove(GameToDelete);
                         await _context.SaveChangesAsync();
                         return Ok(true);
                     }
-                    return BadRequest("no such Game");
+
+                    return BadRequest("Wrong user");
                 }
-                return BadRequest("user not log in");
+                
+                return BadRequest("No such game");
             }
             return BadRequest("empty session");
         }

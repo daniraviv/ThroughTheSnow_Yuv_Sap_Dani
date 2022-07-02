@@ -1,22 +1,65 @@
-﻿@page "/EditGame"
+﻿@page "/Items/{gameid:int}"
+@using ThroughTheSnow_Yuv_Sap_Dani.Shared.Entities
+@inject HttpClient Http
+@inject NavigationManager nav
+
+@if (thisGame != null)
+{
+    
+    <h3>שם המשחק:  @thisGame.GameName </h3>
+
+    <EditForm Model="Thisitem" OnSubmit="SendForm">
+        הוספת הנחייה: <InputText @bind-Value="thisGame.GameInstruction"></InputText> @*להוסיף כפתור וספירת תווים*@
+        יצירת פריטים לשאלה
+        ערך הפריט
+        <MudSwitch @bind-Checked="@_isOpen" Color="Color.Primary" />
 
 
-<h3>שם המשחק: </h3>
-<br />
-הוספת הנחייה :
-<InputText @bind-Value="question" />
-<br />
-<h3>יצירת פריטים לשאלה</h3>
-<br />
-ערך הפריט:
-    נכון <label class="switch">
-    <input type="checkbox">
-    <span class="slider"></span>
-</label> לא נכון
+    </EditForm>
 
-<input id="Button2" type="button" value="הוספה" />
+        }
+
+        @code {
+            [Parameter]
+            public int gameid { get; set; }
+
+            string question = "";
+            string msg = "";
+            Game thisGame;
+            Item Thisitem = new Item();
+
+            protected async override Task OnInitializedAsync()
+            {
+                var getResponse = await Http.GetAsync("api/Items/" + gameid);
+                if (getResponse.IsSuccessStatusCode == true)
+                {
+                    thisGame = getResponse.Content.ReadFromJsonAsync<Game>().Result;
+                    msg = "Success";
+                }
+                //else
+                //{
+                //    string error = getResponse.Content.ReadAsStringAsync().Result;
+                //    if (error == "User not login" || error == "Empty Session")
+                //    {
+                //        nav.NavigateTo("./");
+                //    }
+                else
+                {
+                    msg = "שגיאת רשת";
+                }
+            }
 
 
-@code {
-    string question = "";
-}
+            void SendForm()
+            {
+                msg = "ok";
+            }
+
+
+
+            }
+
+
+
+
+        
