@@ -1,0 +1,24 @@
+﻿@using ThroughTheSnow_Yuv_Sap_Dani.Shared.Entities
+@inject HttpClient Http
+
+
+
+
+<MudPaper Height="80px" Width="80%">
+    <h3>פריטים: @CorrOrNot </h3>
+
+  <p>  @ItemToShow.ItemContent </p>
+
+</MudPaper>
+
+
+
+
+@code {
+    [Parameter]
+    public string CorrOrNot { get; set; }
+    [Parameter]
+    public Item ItemToShow { get; set; }
+
+
+}

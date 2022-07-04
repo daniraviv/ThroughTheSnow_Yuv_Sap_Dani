@@ -5,61 +5,169 @@
 
 @if (thisGame != null)
 {
-    
+
     <h3>שם המשחק:  @thisGame.GameName </h3>
 
-    <EditForm Model="Thisitem" OnSubmit="SendForm">
-        הוספת הנחייה: <InputText @bind-Value="thisGame.GameInstruction"></InputText> @*להוסיף כפתור וספירת תווים*@
+    <EditForm Model="Newitem" OnSubmit="SendForm">
+        הוספת הנחייה: <InputText @bind-Value="thisGame.GameInstruction"></InputText>   <MudButton Variant="Variant.Filled" OnClick="CreateInstruction">הוספה</MudButton> @*להוסיף כפתור וספירת תווים*@
+        <br />
         יצירת פריטים לשאלה
-        ערך הפריט
-        <MudSwitch @bind-Checked="@_isOpen" Color="Color.Primary" />
+        <br /> ערך הפריט
+        לא נכון <MudSwitch @bind-Checked="@isCorrect" @bind-value="Newitem.IsCorrect" Color="Color.Primary" /> נכון
+        <br />
+        <InputText @bind-Value="Newitem.ItemContent"></InputText>
+        <MudButton Variant="Variant.Filled" OnClick="CreateItem">הוספה</MudButton>
+        <MudButton Variant="Variant.Filled" OnClick="showitem">רשימה</MudButton>
 
 
+
+        <input type="submit" value="send" />
     </EditForm>
+    <p>@msg</p>
+    <CorrectOrNot CorrOrNot="נכונים" />
+    <CorrectOrNot CorrOrNot="לא נכונים" />
+
+}
+
+
+@*@if (AllItemsList.Count > 0)
+{
+
+    <ul>
+        @foreach (Item i in AllItemsList) 
+        { 
+        <li><CorrectOrNot ItemToShow="i" /></li>
+        }
+      
+        }
+    </ul>}*@
+
+@if (AllItemsList.Count > 0)
+{
+
+    <ul>
+        @foreach (Item w in AllItemsList)
+        {
+            if (w.GameID == gameid)
+            {
+                <li> @w.ItemContent  @w.IsCorrect</li>
+            }
+
 
         }
-
-        @code {
-            [Parameter]
-            public int gameid { get; set; }
-
-            string question = "";
-            string msg = "";
-            Game thisGame;
-            Item Thisitem = new Item();
-
-            protected async override Task OnInitializedAsync()
-            {
-                var getResponse = await Http.GetAsync("api/Items/" + gameid);
-                if (getResponse.IsSuccessStatusCode == true)
-                {
-                    thisGame = getResponse.Content.ReadFromJsonAsync<Game>().Result;
-                    msg = "Success";
-                }
-                //else
-                //{
-                //    string error = getResponse.Content.ReadAsStringAsync().Result;
-                //    if (error == "User not login" || error == "Empty Session")
-                //    {
-                //        nav.NavigateTo("./");
-                //    }
-                else
-                {
-                    msg = "שגיאת רשת";
-                }
-            }
+    </ul>}
 
 
-            void SendForm()
-            {
-                msg = "ok";
-            }
+@code {
+    [Parameter]
+    public int gameid { get; set; }
+
+    //string question = "";
+    string msg = "";
+    Game thisGame;
+    Item Newitem = new Item();
+    public bool isCorrect { get; set; } = true;
+    List<Item> AllItemsList = new List<Item>();
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        var getResponse = await Http.GetAsync("api/Items/" + gameid);
+
+        if (getResponse.IsSuccessStatusCode == true)
+        {
+            thisGame = getResponse.Content.ReadFromJsonAsync<Game>().Result;
+        }
+
+        else
+        {
+            msg = "שגיאת רשת";
+        }
+    }
+
+    async Task showitem()
+    {
+
+        var getResponse2 = await Http.GetAsync("api/Items/");
+        if (getResponse2.IsSuccessStatusCode == true)
+        {
+            AllItemsList = getResponse2.Content.ReadFromJsonAsync<List<Item>>().Result;
+        }
+    }
+
+
+    async Task CreateInstruction()
+
+    {
+        var UpdateResponse = await Http.PostAsJsonAsync("api/Games/Update", thisGame);
+        if (UpdateResponse.IsSuccessStatusCode == true)
+        {
+            Game UpdatedGame = UpdateResponse.Content.ReadFromJsonAsync<Game>().Result;
+
+            thisGame = UpdatedGame;
+
+        }
+    }
 
 
 
-            }
+
+    async Task CreateItem()
+    {
+        Newitem.GameID = thisGame.ID;
+        if (isCorrect == true)
+        {
+            Newitem.IsCorrect = true;
+        }
+        else
+        {
+            Newitem.IsCorrect = false;
+        }
+        var postResponse = await Http.PostAsJsonAsync("api/Items/InsertItem", Newitem);
+
+        if (postResponse.IsSuccessStatusCode == true)
+        {
+            Item myNewItem = postResponse.Content.ReadFromJsonAsync<Item>().Result;
+
+
+            thisGame.GameItems.Add(myNewItem);
+            Newitem = new Item();
+
+        }
+        else
+        {
+            msg = "תקלה";
+        }
+
+    }
 
 
 
 
-        
+
+
+
+
+
+
+
+    void SendForm()
+    {
+        if (isCorrect == true)
+        {
+            msg = "תשובה נכונה";
+        }
+        else
+        {
+            msg = "לא נכון";
+        }
+    }
+
+
+
+}
+
+
+
+
+

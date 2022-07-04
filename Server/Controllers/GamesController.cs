@@ -54,6 +54,23 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
             Game gameToReturn = await _context.Games.FirstOrDefaultAsync(g => g.GameCode == gameCode);
             if (gameToReturn != null)
             {
+                if (gameToReturn.GameName !=null)
+                {
+                    return Ok(gameToReturn.ID);
+                }
+                return BadRequest("הוסף שם משחק");
+            }
+
+            return BadRequest("No such game");
+        }
+
+
+        [HttpGet("playbyCode/{gameCode}")]
+        public async Task<IActionResult> GetGameByCode2(int gameCode)
+        {
+            Game gameToReturn = await _context.Games.FirstOrDefaultAsync(g => g.GameCode == gameCode);
+            if (gameToReturn != null)
+            {
                 if (gameToReturn.IsPublish == true)
                 {
                     return Ok(gameToReturn.ID);
@@ -65,7 +82,6 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
         }
 
 
-      
 
         [HttpPost("Insert")]
         public async Task<IActionResult> AddGame(Game newGame)
@@ -123,6 +139,34 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
                 return BadRequest("No such game");
             }
             return BadRequest("empty session");
+        }
+
+
+
+
+
+        [HttpPost("Update")]
+
+        public async Task<IActionResult> UpdateWorker(Game GameToUpdate)
+        {
+            Game GameFromDB = await _context.Games.FirstOrDefaultAsync(g => g.ID == GameToUpdate.ID);
+            if (GameFromDB != null)
+            {
+                GameFromDB.GameName = GameToUpdate.GameName;
+                GameFromDB.GameInstruction = GameToUpdate.GameInstruction;
+                GameFromDB.IsPublish = GameToUpdate.IsPublish;
+
+                await _context.SaveChangesAsync();
+                return Ok(GameFromDB);
+
+            }
+
+            else
+            {
+                return BadRequest("no such Game");
+            }
+
+
         }
 
     }
