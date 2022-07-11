@@ -36,7 +36,7 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
                 if (userId == Convert.ToInt32(SessionContent))
                 {
                     // User userToReturn = await _context.Users.Include(u => u.UserGames).ThenInclude(g=> g.GameMissions).FirstOrDefaultAsync(u => u.ID == userId); שליפה משתי טבלאות אחת אחרי השניה
-                    User userToReturn = await _context.Users.Include(u => u.UserGames).FirstOrDefaultAsync(u => u.ID == userId);
+                    User userToReturn = await _context.Users.Include(u => u.UserGames).ThenInclude(g => g.GameItems).FirstOrDefaultAsync(u => u.ID == userId);
                     if (userToReturn != null)
                     {
                         return Ok(userToReturn);
@@ -103,6 +103,11 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
                     newGame.GameCode = newGame.ID + 100;
                     await _context.SaveChangesAsync();
 
+                    newGame.GameItems = new List<Item>();
+                    await _context.SaveChangesAsync();
+
+
+
 
                     return Ok(newGame);
                 }
@@ -155,6 +160,7 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
                 GameFromDB.GameName = GameToUpdate.GameName;
                 GameFromDB.GameInstruction = GameToUpdate.GameInstruction;
                 GameFromDB.IsPublish = GameToUpdate.IsPublish;
+                GameFromDB.GameItems = GameToUpdate.GameItems;
 
                 await _context.SaveChangesAsync();
                 return Ok(GameFromDB);

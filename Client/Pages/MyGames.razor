@@ -3,43 +3,59 @@
 @inject HttpClient Http
 @inject NavigationManager nav
 @inject IDialogService DialogService
-<h3>Games</h3>
-
-@if (currentUser != null)
-{
-    <h3>המשחקים של  @currentUser.FirstName </h3>
-    <br />
-    <h4>משחק חדש:<input id="Text1" type="text" @bind="newGame.GameName" /><input id="Button1" type="button" value="הוספת משחק" @onclick="CreateGame" /></h4>
-    <br />
-    <MudTable Items="@currentUser.UserGames" Hover="true">
-        <HeaderContent>
-            <MudTh>שם המשחק</MudTh>
-            <MudTh>קוד המשחק</MudTh>
-            <MudTh>עריכה</MudTh>
-            <MudTh>מחיקה</MudTh>
-            <MudTh>פרסום המשחק</MudTh>
-
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="שם המשחק">@context.GameName</MudTd>
-            <MudTd DataLabel="קוד המשחק">@context.GameCode</MudTd>
-            <MudTd DataLabel="עריכה">
-                <MudIconButton Icon="@Icons.Material.Outlined.Edit" @onclick="() => EditGamePage(context.GameCode)" />
-            </MudTd>
-            <MudTd DataLabel="מחיקה">
-                <MudIconButton Icon="@Icons.Material.Filled.Delete"@onclick="() => OpenDialog(context.ID, context.GameName)" aria-label="delete"></MudIconButton>
-            </MudTd>
-            <MudTd DataLabel="פרסום המשחק">
-                <MudCheckBox CheckedChanged="@((bool newState) => PublishGame(context))" Checked="@context.IsPublish" Color="Color.Primary"></MudCheckBox>
-
-            </MudTd>
-        </RowTemplate>
-    </MudTable>
-    <p> @msg</p>}
 
 
+<div class="BgWSign">
+
+    @if (currentUser != null)
+    {
+        //<h3>המשחקים של  @currentUser.FirstName </h3>
+        <br />
+
+        <h4>
+            משחק חדש:
+        </h4>
+        <div Class="whiteBlock">
+            <MudTextField T="string" @bind-Value="newGame.GameName" Counter="20" MaxLength="20" HelperText="תווים" Immediate="true" Validation="@(new Func<string, IEnumerable<string>>(MaxCharacters))" Variant="Variant.Text" DisableUnderLine="true" />
+        </div>
+        <br />
+  
+        <MudButton Class="buttonGame2" Variant="Variant.Filled" OnClick="CreateGame">צור משחק</MudButton>
+
+        <br />
+        <MudTable Items="@currentUser.UserGames" Hover="true">
+            <HeaderContent>
+                <MudTh>שם המשחק</MudTh>
+                <MudTh>קוד המשחק</MudTh>
+                <MudTh>עריכה</MudTh>
+                <MudTh>מחיקה</MudTh>
+                <MudTh>פרסום המשחק</MudTh>
+
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="שם המשחק">@context.GameName</MudTd>
+                <MudTd DataLabel="קוד המשחק">@context.GameCode</MudTd>
+                <MudTd DataLabel="עריכה">
+                    <MudIconButton Icon="@Icons.Material.Outlined.Edit" @onclick="() => EditGamePage(context.GameCode)" />
+                </MudTd>
+                <MudTd DataLabel="מחיקה">
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" @onclick="() => OpenDialog(context.ID, context.GameName)" aria-label="delete"></MudIconButton>
+                </MudTd>
+                <MudTd DataLabel="פרסום המשחק">
+                    <MudCheckBox CheckedChanged="@((bool newState) => PublishGame(context))" Checked="@context.IsPublish" Color="Color.Primary" Disabled="@(canPublish(context)?false:true)"> </MudCheckBox>
 
 
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+
+
+
+
+        }
+
+
+</div>
 
 @code
 { [Parameter]
@@ -50,7 +66,7 @@
     Game currentGame;
     User currentUser;
     string msg = "";
-    //string NewGame = "";
+    // string NewGame = "";
     Game newGame = new Game();
 
 
@@ -58,9 +74,13 @@
     protected async override Task OnInitializedAsync()
     {
         var getResponse = await Http.GetAsync("api/Games/" + userId);
+
+
         if (getResponse.IsSuccessStatusCode == true)
         {
             currentUser = getResponse.Content.ReadFromJsonAsync<User>().Result;
+
+
         }
         else
         {
@@ -75,6 +95,9 @@
             }
         }
     }
+
+
+
     async Task CreateGame()
     {
         //newGame.UserID = currentUser.ID;
@@ -96,8 +119,8 @@
     {
         var parameters = new DialogParameters();
         parameters.Add("contentText", "האם אתה בטוח שתרצה למחוק את " + gameName + "?");
-        var options = new DialogOptions {};
-        var diag = DialogService.Show<DeleteGame>("האם אתה בטוח שתרצה למחוק את " + gameName + "?", options);
+        var options = new DialogOptions { };
+        var diag = DialogService.Show<DeleteComp>("האם אתה בטוח שתרצה למחוק את " + gameName + "?", options);
         var result = await diag.Result;
         if (result != null)
         {
@@ -143,11 +166,45 @@
         }
     }
 
+    bool canPublish(Game thisGame)
+    {
+
+        int corrItemCount = 0;
+        int inCorrItemCount = 0;
+        if (thisGame.GameItems.Count < 10)
+        {
+            return false;
+        }
+        foreach (Item i in thisGame.GameItems)
+        {
+            if (i.IsCorrect)
+            {
+                corrItemCount++;
+            }
+            else
+            {
+                inCorrItemCount++;
+            }
+
+        }
+        if (corrItemCount < 4)
+        {
+            return false;
+        }
+        if (corrItemCount < 2)
+        {
+            return false;
+        }
+        //return true;
+        return true;
+    }
 
 
-
-
-
+    private IEnumerable<string> MaxCharacters(string ch)
+    {
+        if (!string.IsNullOrEmpty(ch) && 20 == ch?.Length)
+            yield return "";
+    }
 
 
     void PublishGame(Game selectedGame)

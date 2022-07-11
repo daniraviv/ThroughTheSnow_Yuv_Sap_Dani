@@ -1,5 +1,158 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+#startBackG {
+    background-image: url('../css/images/מסך כניסה – 1.png');
+    background-size: 100%;
+    background-repeat: no-repeat;
+    z-index: 0;
+    width: 1280px;
+    height:730px;
+    padding-top: 1px;
+    position:absolute;
+    top:-10px;
+}
+
+/*כותרת שם משתמש*/
+#EmailTitle {
+    color: black;
+    font-family: 'Segoe UI';
+    font-weight: bold;
+    font-size: 25px;
+    margin-right: 713px;
+    margin-top: 25px;
+}
+
+/*ריבוע לבן למילוי המייל*/
+#EmailAdress {
+    color: black;
+    font-family: 'Segoe UI';
+    font-weight: normal;
+    font-size: 20px;
+    margin-right: 640px;
+    margin-top: 10px;
+    background-color: white;
+    border: 2px solid #AEAAA8;
+    border-radius: 10px;
+    box-sizing: border-box;
+    height: 45px;
+    width: 350px;
+}
+
+.buttonGame {
+    background-image: url(../css/images/button_img.png);
+    font-family: 'Segoe UI';
+  
+    font-size: 20px;
+
+    height: 35px;
+    width: 113px;
+    margin-right: 770px;
+    margin-top: 10px;
+}
+
+.buttonGame2 {
+    background-image: url('../css/images/Group 300.png');
+    font-family: 'Segoe UI';
+    font-size: 14px;
+    background-repeat: no-repeat;
+    background-size: 100%;
+
+      
+}
+
+
+
+/*ריבוע לבן*/
+.whiteBlock {
+    color: black;
+    font-family: 'Segoe UI';
+    font-weight: normal;
+    font-size: 20px;
+    margin-top: 30px;
+    background-color:white;
+    
+
+    border-radius: 10px;
+    box-sizing: border-box;
+    height: 52px;
+    width: 200px;
+}
+
+
+
+.mud-button-text.mud-button-text-primary {
+    color: #424242;
+}
+
+
+
+
+#downDiv {
+    position: relative;
+    top: 290px;
+    left: 178px;
+}
+
+.plainBg {
+    background-image: url('../css/images/plainBG.png');
+    background-size: 100%;
+    background-repeat: no-repeat;
+    z-index: 0;
+    width: 1613px;
+    height: 900px;
+    padding-top: 1px;
+}
+
+
+.BgWSign {
+    background-image: url(../css/images/bgSign.png);
+    background-size: 100%;
+    background-repeat: no-repeat;
+    z-index: 0;
+    width: 1280px;
+    height: 730px;
+    padding-top: 1px;
+    position: absolute;
+    top: -10px;
+}
+
+.dialogDesign {
+    width: 480px;
+    height: 200px;
+    border-radius: 50px;
+    border-color: gold;
+    border-width:thick;
+    background-image: url('../css/images/Rectangle 106 (1).png');
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
@@ -48,3 +201,22 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+
+    section 
+    {
+
+        border :2px solid green;
+    }
+
+
+
+
+#itemcontent {
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    padding: 20px;
+    width: 100px;
+    height: 80px;
+}
+
