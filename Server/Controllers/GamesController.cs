@@ -36,7 +36,7 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
                 if (userId == Convert.ToInt32(SessionContent))
                 {
                     // User userToReturn = await _context.Users.Include(u => u.UserGames).ThenInclude(g=> g.GameMissions).FirstOrDefaultAsync(u => u.ID == userId); שליפה משתי טבלאות אחת אחרי השניה
-                    User userToReturn = await _context.Users.Include(u => u.UserGames).FirstOrDefaultAsync(u => u.ID == userId);
+                    User userToReturn = await _context.Users.Include(u => u.UserGames).ThenInclude(g => g.GameItems).FirstOrDefaultAsync(u => u.ID == userId);
                     if (userToReturn != null)
                     {
                         return Ok(userToReturn);
@@ -54,48 +54,117 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
             Game gameToReturn = await _context.Games.FirstOrDefaultAsync(g => g.GameCode == gameCode);
             if (gameToReturn != null)
             {
-                if (gameToReturn.IsPublish == true)
+                if (gameToReturn.GameName !=null)
                 {
-                    return Ok(gameToReturn);
+                    return Ok(gameToReturn.ID);
                 }
-                return BadRequest("game not published");
+                return BadRequest("הוסף שם משחק");
             }
 
             return BadRequest("No such game");
         }
 
 
+
+
+
+
         [HttpPost("Insert")]
         public async Task<IActionResult> AddGame(Game newGame)
         {
-            if (newGame != null)
+            string sessionContent = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(sessionContent) == false) 
             {
-                _context.Games.Add(newGame);
-                await _context.SaveChangesAsync();
+                int SessionId = Convert.ToInt32(sessionContent);
+                
+                if (newGame != null)
+                {
+                    newGame.UserID = SessionId;
+                    await _context.SaveChangesAsync();
 
-                return Ok(newGame);
-            }
-            else
-            {
+                    
+                    _context.Games.Add(newGame);
+                    await _context.SaveChangesAsync();
+
+                    newGame.GameCode = newGame.ID + 100;
+                    await _context.SaveChangesAsync();
+
+                    newGame.GameItems = new List<Item>();
+                    await _context.SaveChangesAsync();
+
+
+
+
+                    return Ok(newGame);
+                }
                 return BadRequest("game was not send");
-            }
+      
+                }
+            return BadRequest("game was not send");
+
         }
+           
+        
 
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletGame(int id)
         {
-            Game GameToDelete = await _context.Games.FirstOrDefaultAsync(g => g.ID == id);
-            if (GameToDelete != null)
+            string sessionContent = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(sessionContent) == false)
             {
-                _context.Games.Remove(GameToDelete);
-                await _context.SaveChangesAsync();
-                return Ok(true);
+                int SessionId = Convert.ToInt32(sessionContent);
+                Game GameToDelete = await _context.Games.FirstOrDefaultAsync(g => g.ID == id);
+                if (GameToDelete != null)
+                {
+                    if (SessionId == GameToDelete.UserID)
+                    {
+                        _context.Games.Remove(GameToDelete);
+                        await _context.SaveChangesAsync();
+                        return Ok(true);
+                    }
+
+                    return BadRequest("Wrong user");
+                }
+                
+                return BadRequest("No such game");
             }
+            return BadRequest("empty session");
+        }
+
+
+
+
+
+        [HttpPost("Update")]
+
+        public async Task<IActionResult> UpdateWorker(Game GameToUpdate)
+        {
+            string sessionContent = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(sessionContent) == false)
+            {
+                int SessionId = Convert.ToInt32(sessionContent);
+                Game GameFromDB = await _context.Games.FirstOrDefaultAsync(g => g.ID == GameToUpdate.ID);
+            if (GameFromDB != null)
+            {
+                GameFromDB.GameName = GameToUpdate.GameName;
+                GameFromDB.GameInstruction = GameToUpdate.GameInstruction;
+                GameFromDB.IsPublish = GameToUpdate.IsPublish;
+                GameFromDB.GameItems = GameToUpdate.GameItems;
+
+                await _context.SaveChangesAsync();
+                return Ok(GameFromDB);
+
+            }
+
             else
             {
                 return BadRequest("no such Game");
             }
+
+
+            }
+            return BadRequest("empty session");
         }
 
        

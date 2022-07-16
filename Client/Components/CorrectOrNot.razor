@@ -1,0 +1,126 @@
+﻿@using ThroughTheSnow_Yuv_Sap_Dani.Shared.Entities
+@inject HttpClient Http
+@inject IDialogService DialogService
+
+@*<MudContainer MaxWidth="MaxWidth.Large">*@
+@*<MudPaper>*@
+<div>
+    <h3>פריטים: @CorrOrNot (@itemnum())</h3>
+
+    <section class="grid-container">
+
+
+        @foreach (Item i in ItemsToShow)
+        {
+            if (i.GameID == gameid)
+            {
+
+                if (i.ItemType == "text")
+                {
+                    <div id="itemcontent">@i.ItemContent  <MudIconButton Class="deletebtn" Icon="@Icons.Rounded.HighlightOff" @onclick="() => OpenDialog(i)"></MudIconButton> <MudIconButton Class="editbtn" Icon="@Icons.Outlined.Edit" @onclick="() => EditItem(i)"></MudIconButton></div>
+
+                }
+
+                if (i.ItemType == "Image")
+                {
+                    <div id="imageContent"> <img src="@i.ItemContent" width="85" /> <MudIconButton Class="deletebtn" Icon="@Icons.Rounded.HighlightOff" @onclick="() => OpenDialog(i)"></MudIconButton></div>
+
+                }
+
+
+
+            }
+
+        }
+        @*</MudPaper>*@
+    </section>
+</div>
+@*</MudContainer>*@
+
+<br />
+
+
+@code {
+
+
+
+
+    [Parameter]
+    public string CorrOrNot { get; set; }
+
+    [Parameter]
+    public int gameid { get; set; }
+
+    [Parameter]
+    public List<Item> ItemsToShow { get; set; }
+
+
+
+    [Parameter]
+    public EventCallback<Item> ItemCallBack { get; set; }
+
+    [Parameter]
+    public EventCallback<Item> ItemPostCallBack { get; set; }
+
+
+
+
+    async Task DeleteItem(Item ItemToDelete)
+    {
+        var DeleteRespones = await Http.DeleteAsync("api/Items/" + ItemToDelete.ID);
+        // משתמשים בוואר כאשר קוראים לאיפיאיי
+
+        if (DeleteRespones.IsSuccessStatusCode == true)
+        {
+            await ItemCallBack.InvokeAsync(ItemToDelete); //InvokeAsync מפעיל את הטריגר
+
+        }
+    }
+
+
+
+    async Task OpenDialog(Item itemTodelete)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("contentText", "האם אתה בטוח שתרצה למחוק פריט זה " + "?");
+        var options = new DialogOptions { };
+        var diag = DialogService.Show<DeleteComp>("האם אתה בטוח שתרצה למחוק פריט זה " + "?", options);
+        var result = await diag.Result;
+        if (result != null)
+        {
+            if (!result.Cancelled)
+            {
+                await DeleteItem(itemTodelete);
+            }
+        }
+    }
+
+
+
+    async Task EditItem(Item ItemToUpdate)
+    {
+        //    var PostRespones = await Http.PostAsJsonAsync("api/Items/Update" , ItemToUpdate);
+
+
+        //    if (PostRespones.IsSuccessStatusCode == true)
+        //    {
+        //        await ItemPostCallBack.InvokeAsync(ItemToUpdate); //InvokeAsync מפעיל את הטריגר
+
+        //    }
+        //}
+        await ItemPostCallBack.InvokeAsync(ItemToUpdate);
+
+    }
+
+    int itemnum()
+    {
+        int counter = 0;
+        @foreach (Item i in ItemsToShow)
+        {
+            if (i.GameID == gameid)
+            {
+                counter++;
+            }
+        }
+            return counter;
+        } }

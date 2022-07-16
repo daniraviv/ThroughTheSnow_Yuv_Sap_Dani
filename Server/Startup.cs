@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 using ThroughTheSnow_Yuv_Sap_Dani.Server.Data;
+using ThroughTheSnow_Yuv_Sap_Dani.Server.Helpers;
 
 namespace ThroughTheSnow_Yuv_Sap_Dani.Server
 {
@@ -42,6 +43,8 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server
             });
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<FileStorage>();
+
 
         }
 

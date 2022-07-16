@@ -2,54 +2,93 @@
 @using ThroughTheSnow_Yuv_Sap_Dani.Shared.Entities
 @inject HttpClient Http
 @inject NavigationManager nav
-<h3>Games</h3>
+@inject IDialogService DialogService
+    <NavBar></NavBar>
+<div class="BgWSign" style="margin-top:80px">
 
-@if (currentUser != null)
-{
-    <h3>המשחקים של  @currentUser.FirstName </h3>
-    <br />
-    <h4>משחק חדש:<input id="Text1" type="text" @bind-value="NewGame" /><input id="Button1" type="button" value="הוספת משחק" @*@onclick="AddGame"*@ /></h4>
-    <br />
-    <MudTable Items="@currentUser.UserGames" Hover="true">
-        <HeaderContent>
-            <MudTh>שם המשחק</MudTh>
-            <MudTh>קוד המשחק</MudTh>
-            <MudTh>עריכה</MudTh>
-            <MudTh>פרסום המשחק</MudTh>
+    @if (currentUser != null)
+    {
+       
+        <br />
 
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="שם המשחק">@context.GameName</MudTd>
-            <MudTd DataLabel="קוד המשחק">@context.GameCode</MudTd>
-            <MudTd DataLabel="עריכה">
-                <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
-            </MudTd>
-            <MudTd DataLabel="פרסום המשחק">
-                <MudCheckBox CheckedChanged="@((bool newState) => PublishGame(context))" Checked="@context.IsPublish" Color="Color.Primary"></MudCheckBox>
+        <div Class="inLinne">
+            <div>
+                <h3 style="margin-right:10px; margin-bottom:-30px;margin-bottom:10px"  >
+                    משחק חדש:
+                </h3>
 
-            </MudTd>
-        </RowTemplate>
-    </MudTable>
-    <p> @msg</p>}
+               
+                    <MudTextField  Style="background-color: rgba(255, 255, 255, 0.4); width: 230px;border-radius:10px; padding-right:3px;" T="string" @bind-Value="newGame.GameName" Counter="20" MaxLength="20" HelperText="תווים" Immediate="true" Validation="@(new Func<string, IEnumerable<string>>(MaxCharacters))" Variant="Variant.Text" DisableUnderLine="true" />
+               
+            </div>
+        </div>
+  
+  
+        <MudButton Style="display:inline-block; margin-right:10px" Class="buttonGame2 inLinne" Variant="Variant.Filled" Disabled="@(canGiveName(newGame) ? false : true)"  OnClick="CreateGame">צור משחק</MudButton>
+
+        <br />
+    
+        <div >
+            <MudTable Items="@currentUser.UserGames" Style="        background-color: rgba(255, 255, 255, 0.3);
+        overflow-y: initial;
+        margin-top: 100px;"    >
+                <HeaderContent>
+                    <MudTh>שם המשחק</MudTh>
+                    <MudTh>קוד המשחק</MudTh>
+                    <MudTh>עריכה</MudTh>
+                    <MudTh>מחיקה</MudTh>
+                    <MudTh>פרסום המשחק</MudTh>
+
+                </HeaderContent>
+                <RowTemplate >
+                    <MudTd  DataLabel="שם המשחק">@context.GameName</MudTd>
+                    <MudTd  DataLabel="קוד המשחק">@context.GameCode</MudTd>
+                    <MudTd DataLabel="עריכה">
+                        <MudIconButton Icon="@Icons.Material.Outlined.Edit" @onclick="() => EditGamePage(context.GameCode)" />
+                    </MudTd>
+                    <MudTd DataLabel="מחיקה">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" @onclick="() => OpenDialog(context.ID, context.GameName)"></MudIconButton>
+                    </MudTd>
+                    <MudTd DataLabel="פרסום המשחק">
+                        <MudCheckBox CheckedChanged="@((bool newState) => PublishGame(context))" Checked="@context.IsPublish" Color="Color.Primary" Disabled="@(canPublish(context) ? false : true)"> </MudCheckBox>
+
+
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </div>
 
 
 
+    }
 
+    <p>@errormsg</p>
+</div>
 
 @code
 { [Parameter]
     public int userId { get; set; }
 
+    string errormsg = "";
+
+    Game currentGame;
     User currentUser;
     string msg = "";
-    string NewGame = "";
+    // string NewGame = "";
+    Game newGame = new Game();
+
+
 
     protected async override Task OnInitializedAsync()
     {
         var getResponse = await Http.GetAsync("api/Games/" + userId);
+
+
         if (getResponse.IsSuccessStatusCode == true)
         {
             currentUser = getResponse.Content.ReadFromJsonAsync<User>().Result;
+
+
         }
         else
         {
@@ -65,8 +104,155 @@
         }
     }
 
-    void PublishGame(Game selectedGame)
+
+
+    async Task CreateGame()
+    {
+        //newGame.UserID = currentUser.ID;
+        var postResponse = await Http.PostAsJsonAsync("api/Games/Insert", newGame);
+        if (postResponse.IsSuccessStatusCode == true)
+        {
+            Game myNewGame = postResponse.Content.ReadFromJsonAsync<Game>().Result;
+            currentUser.UserGames.Add(myNewGame);
+            newGame = new Game();
+        }
+        else
+        {
+            msg = "תקלה";
+        }
+
+    }
+
+    async Task OpenDialog(int GameId, string gameName)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("contentText", "האם אתה בטוח שתרצה למחוק את " + gameName + "?");
+        var options = new DialogOptions { };
+        var diag = DialogService.Show<DeleteComp>("האם אתה בטוח שתרצה למחוק את " + gameName + "?", options);
+        var result = await diag.Result;
+        if (result != null)
+        {
+            if (!result.Cancelled)
+            {
+                await DeleteGameCallback(GameId);
+            }
+        }
+    }
+
+    async Task DeleteGameCallback(int gameToDeletId)
+    {
+
+        var DeleteResponse = await Http.DeleteAsync("api/Games/" + gameToDeletId);
+        bool isDeleted = DeleteResponse.Content.ReadFromJsonAsync<bool>().Result;
+
+        if (isDeleted == true && DeleteResponse.IsSuccessStatusCode == true)
+        {
+            currentUser.UserGames.RemoveAll(g => g.ID == gameToDeletId);
+            currentGame = new Game();
+        }
+        else
+        {
+            string error = DeleteResponse.Content.ReadAsStringAsync().Result;
+            if (error == "empty session")
+            {
+                nav.NavigateTo("./");
+                errormsg = "יש להתחבר מחדש";
+            }
+        }
+    }
+
+    async Task EditGamePage(int GameCode)
+    {
+
+        // קריאה לקוטרולר
+        var nextPage = await Http.GetAsync("api/Games/byCode/" + GameCode);
+
+        if (nextPage.IsSuccessStatusCode == true)
+        {
+            int gameid = nextPage.Content.ReadFromJsonAsync<int>().Result;
+            // פנייה לעמוד גיימז שהכתובת שלו היא של המשתמש שהוזן
+            nav.NavigateTo("./Items/" + gameid);
+
+            // אין צורך לשלוח הודעה כי המשתמש מופנה לדף
+            //msg = "login worked";
+        }
+
+        else
+        {
+            msg = "login failed";
+        }
+    }
+
+    bool canPublish(Game thisGame)
+    {
+
+        int corrItemCount = 0;
+        int inCorrItemCount = 0;
+        if (thisGame.GameItems.Count < 10)
+        {
+            return false;
+        }
+        foreach (Item i in thisGame.GameItems)
+        {
+            if (i.IsCorrect)
+            {
+                corrItemCount++;
+            }
+            else
+            {
+                inCorrItemCount++;
+            }
+
+        }
+        if (corrItemCount < 4)
+        {
+            return false;
+        }
+        if (corrItemCount < 2)
+        {
+            return false;
+        }
+        //return true;
+        return true;
+    }
+
+
+    private IEnumerable<string> MaxCharacters(string ch)
+    {
+        if (!string.IsNullOrEmpty(ch) && 20 == ch?.Length)
+            yield return "";
+    }
+
+
+    async Task PublishGame(Game selectedGame)
     {
         selectedGame.IsPublish = !selectedGame.IsPublish;
+
+        var postResponse = await Http.PostAsJsonAsync("api/Games/Update", selectedGame);
+        if (postResponse.IsSuccessStatusCode == true)
+        {
+            Game myNewGame = postResponse.Content.ReadFromJsonAsync<Game>().Result;
+
+
+
+        }
+
     }
-}
+
+
+    bool canGiveName(Game GameName)
+    {
+
+
+
+        if (GameName.GameName == null)
+        {
+            return false;
+        }
+
+
+        return true;
+    }
+
+
+    }

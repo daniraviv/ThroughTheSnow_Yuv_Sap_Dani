@@ -1,50 +1,64 @@
 ﻿@page "/"
 @inject HttpClient Http
-
 @inject NavigationManager nav
-<h3 id="tgfg">Login</h3>
 
-<MudTextField @bind-Value="inputMail" Label="Outlined" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
-<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="loginUser">כניסה</MudButton>
-<p>@msg</p>
+<body>
+<NavBar></NavBar>
 
-@code
+        <div id="startBackG" style="margin-top:80px">
+
+            <div id="downDiv">
+                <h2 id="EmailTitle">הזינו כתובת מייל</h2>
+
+
+                <MudTextField id="EmailAdress" @bind-Value="inputMail" Placeholder="כתובת מייל" DisableUnderLine="true"></MudTextField>
+                <br />
+
+                <MudButton Class="buttonGame" Variant="Variant.Filled" OnClick="loginUser">כניסה</MudButton>
+                <h3 class="ErrorTitle">@msg</h3>
+
+
+            </div>
+
+        </div>
+
+</body>
+
+    @code
  { string inputMail = "";
 
 
-    string msg = "";
+        string msg = "";
 
-    async Task loginUser()
-    {
-
-        // תנאי שבודק האם המשתמש הזין מייל
-        // IsNullOrEmptyכשרוצים להשתמש ב
-        // תמיד נכתוב סוג משתנה סטרינג אם השמצנה עצמו לא מחרוזתי נמיר אותו לסטרינג בתוך הסוגריים
-        if (string.IsNullOrEmpty(inputMail) == false)
+        async Task loginUser()
         {
-            // קריאה לקוטרולר
-            var login = await Http.GetAsync("api/Users/" + inputMail);
 
-            if (login.IsSuccessStatusCode == true)
+
+            if (string.IsNullOrEmpty(inputMail) == false)
             {
-                int userId = login.Content.ReadFromJsonAsync<int>().Result;
-                // פנייה לעמוד גיימז שהכתובת שלו היא של המשתמש שהוזן
-                nav.NavigateTo("./Games/" + userId);
+                // קריאה לקוטרולר
+                var login = await Http.GetAsync("api/Users/" + inputMail);
 
-                // אין צורך לשלוח הודעה כי המשתמש מופנה לדף
-                //msg = "login worked";
+                if (login.IsSuccessStatusCode == true)
+                {
+                    int userId = login.Content.ReadFromJsonAsync<int>().Result;
+                    // פנייה לעמוד גיימז שהכתובת שלו היא של המשתמש שהוזן
+                    nav.NavigateTo("./Games/" + userId);
+
+                    // אין צורך לשלוח הודעה כי המשתמש מופנה לדף
+                    //msg = "login worked";
+                }
+
+                else
+                {
+                    msg = "*משתמש לא קיים";
+                }
             }
 
             else
             {
-                msg = "login failed";
+                msg = "*יש להקליד כתובת מייל";
             }
-        }
-
-        else
-        {
-            msg = "יש להקליד כתובת מייל";
-        }
 
 
-    } }
+        } }

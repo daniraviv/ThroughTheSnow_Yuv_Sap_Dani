@@ -1,7 +1,234 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+
+#startBackG {
+    background-image: url('../css/images/מסך כניסה – 1.png');
+    background-size: 100%;
+    background-repeat: no-repeat;
+    z-index: 0;
+    width: 1280px;
+    height:730px;
+    padding-top: 1px;
+    position:absolute;
+    top:-10px;
+}
+
+/*כותרת שם משתמש*/
+#EmailTitle {
+    color: black;
+    font-family: 'Segoe UI';
+    font-weight: bold;
+    font-size: 25px;
+    margin-right: 713px;
+    margin-top: 25px;
+}
+
+/*ריבוע לבן למילוי המייל*/
+#EmailAdress {
+    color: black;
+    font-family: 'Segoe UI';
+    font-weight: normal;
+    font-size: 20px;
+    margin-right: 640px;
+    margin-top: 10px;
+    background-color: white;
+    border: 2px solid #AEAAA8;
+    border-radius: 10px;
+    box-sizing: border-box;
+    height: 45px;
+    width: 350px;
+}
+
+.buttonGame {
+    background-image: url(../css/images/button_img.png);
+    font-family: 'Segoe UI';
+  
+    font-size: 20px;
+
+    height: 35px;
+    width: 113px;
+    margin-right: 770px;
+    margin-top: 10px;
+}
+
+.buttonGame2 {
+    background-image: url('../css/images/Group 300.png');
+    font-family: 'Segoe UI';
+    font-size: 14px;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    display: inline-block;
+   
+}
+
+
+
+
+
+#whiteBlock2 {
+   
+    font-family: 'Segoe UI';
+    font-weight: normal;
+    font-size: 20px;
+    margin-top: 30px;
+    background-color: rgba(255, 255, 255, 0.2);
+    margin-right: 15px;
+
+    border-radius: 18px;
+    box-sizing: border-box;
+    height: 140px;
+    width: 780px;
+}
+
+#whiteBlock3 {
+
+    font-family: 'Segoe UI';
+    font-weight: normal;
+    font-size: 20px;
+    margin-top: 9px;
+    background-color: rgba(255, 255, 255, 0.2);
+    margin-right: 15px;
+    border-radius: 18px;
+    box-sizing: border-box;
+    height: 240px;
+    width: 1100px;
+}
+
+#QtextBlock {
+   background-color: rgba(255, 255, 255, 0.4);
+   height:80px;
+   width: 580px;
+   border-radius:10px; 
+}
+
+#nameH {
+   background-color: rgba(255, 255, 255, 0.4); width:440px;height:50px; border-radius:20px; position:relative; top:20px; right:10px;padding-top:10px;padding-right:10px
+
+}
+.backbtn {
+    background-image: url('../css/images/Group 303.png');
+    font-family: 'Segoe UI';
+    font-size: 20px;
+    height: 42px;
+    width: 223px;
+    position:absolute;
+    bottom:430px;
+    right:870px;
+  
+}
+
+
+
+.ErrorTitle {
+    color: red;
+    font-family: 'Segoe UI';
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 652px;
+    margin-top: -68px;
+}
+
+.mud-button-text.mud-button-text-primary {
+    color: #424242;
+}
+
+.inLinne {
+    display: inline-block;
+    position: relative;
+    top: 60px;
+  
+}
+
+.overflow {
+    overflow-y: scroll;
+}
+
+#downDiv {
+    position: relative;
+    top: 290px;
+    left: 178px;
+}
+
+.plainBg {
+    background-image: url('../css/images/plainBG.png');
+    background-size: 100%;
+    background-repeat: no-repeat;
+    z-index: 0;
+    width: 1280px;
+    height: 720px;
+   
+   
+}
+
+
+.BgWSign {
+    background-image: url(../css/images/bgSign.png);
+    background-size: 100%;
+    background-repeat: no-repeat;
+    z-index: 0;
+    width: 1280px;
+    height: 730px;
+    padding-top: 1px;
+    position: absolute;
+    top: -10px;
+}
+
+.dialogDesign {
+    width: 480px;
+    height: 200px;
+    border-radius: 50px;
+    border-color: gold;
+    border-width:thick;
+    background-image: url('../css/images/Rectangle 106 (1).png');
+}
+
+.howToEdit {
+    align-content: center;
+    background-color: #f5f6fe;
+}
+
+.dialogAbout {
+    width: 780px;
+    height: 360px;
+    font-size: 20px;
+    font-family: 'Segoe UI';
+    border-radius: 50px;
+    border-color: gold;
+    border-width: thick;
+    background-image: linear-gradient(180deg, #b4dedf, white);
+    text-align:center;
+}
+
+
+
+
+
+.mud-checkbox-input {
+    top: 0;
+    left: 0;
+    width: 100%;
+    cursor: inherit;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    padding: 0;
+    z-index: 1;
+    position: absolute;
+}
+
+
+
+
+
+
+
+
+
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Segoe UI';
+    font-size: 20px;
+    color: black;
+
 }
 
 a, .btn-link {
@@ -48,3 +275,194 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+
+
+
+
+.thisSection {
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius:25px;
+    display: inline-block;
+    width: 580px;
+    height: 250px;
+    overflow: scroll;
+    
+}
+
+
+#itemcontent {
+    display: grid;
+    justify-content: space-evenly;
+    border-radius: 25px;
+    border: 0.5px solid #757575;
+    padding: 3px;
+    width: 100px;
+    height: 100px;
+    font-family: 'Segoe UI';
+    font-size: 14px;
+}
+#imageContent {
+    display: grid;
+    justify-content: space-evenly;
+    border-radius: 25px;
+    border: 0.5px solid #757575;
+    padding: 20px;
+    width: 100px;
+    height: 100px;
+}
+
+.grid-container {
+    display: grid;
+    justify-content: space-evenly;
+    grid-template-columns: 20px 20px 20px 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    grid-row-gap: 5px;
+    padding: 10px;
+}
+
+    .grid-container > div {
+        background-color: rgba(255, 255, 255, 0.2);
+        text-align: center;
+        padding: 10px 10px;
+        font-size: 30px;
+    }
+
+
+    .deletebtn{
+        position:relative;
+        bottom:36px;
+        left:42px;
+       
+    }
+
+.editbtn {
+    position: relative;
+    bottom:-12px;
+    right: 35px;
+}
+
+
+.tablerow {
+    border-radius: 25PX;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.mud-switch-primary.mud-checked + .mud-switch-track {
+    background-color: rgba(245, 249, 255, 0.80);
+}
+.mud-switch-span .mud-switch-track {
+    width: 100%;
+    height: 100%;
+    opacity: .48;
+    z-index: -1;
+    transition: opacity 150ms cubic-bezier(.4,0,.2,1) 0ms,background-color 150ms cubic-bezier(.4,0,.2,1) 0ms;
+    border-radius: 7px;
+    background-color: rgba(245, 249, 255, 0.80);
+    -moz-box-shadow: 3px 3px 5px 6px #ccc;
+    -webkit-box-shadow: 3px 3px 5px 6px #ccc;
+    box-shadow: 3px 3px 5px 6px #ccc;
+}
+.mud-switch-primary.mud-checked {
+    color: rgba(245, 242, 242, 0.70);
+}
+
+
+#signCond {
+    background-image: url('../css/images/Group 302.png');
+    height: 220px;
+    width: 345px;
+    position: relative;
+    bottom:470px;
+    right:900px;
+    
+   
+}
+
+
+nav {
+    background-color: #b1e0e1;
+    padding: 10px;
+    top: 0;
+    left: 0;
+    right: 0;
+   width:1280px;
+}
+
+    nav h1 {
+        display: inline;
+        font-family: 'Segoe UI';
+        font-weight: 800;
+        vertical-align: top;
+        margin-right: 10px
+    }
+
+    nav #right {
+        text-align: right;
+        display: inline;
+        padding-right: 5px
+    }
+
+    nav #left {
+        position: relative;
+        left: -760px;
+        margin: 5px;
+       margin-bottom:30px;
+       
+    }
+
+    nav a {
+        color: white;
+        font-family: 'Segoe UI';
+        font-size: large;
+        padding-left: 20px;
+    }
+
+header {
+    width: 100%;
+    height: 50px;
+    position: absolute;
+    direction: rtl;
+    display: block;
+    direction: rtl;
+    z-index: 3;
+    margin-top: -67px;
+}
+
+.gif{
+background-image:url(../css/images/sheep.gif);
+width:100%;
+}
+
+
