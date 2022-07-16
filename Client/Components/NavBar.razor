@@ -1,5 +1,5 @@
 ﻿@inject IDialogService Dialog
-
+@inject NavigationManager nav
 <div id="container">
     <header>
         <nav>
@@ -8,24 +8,24 @@
 
             </div>
             <span id="left">
-                <a id="howToPlay"  @onclick="@((e) => OpenDialog2(maxWidth))">איך עורכים?</a>
+                <a id="howToPlay" @onclick="@((e) => OpenDialog2(maxWidth))">איך עורכים?</a>
                 <a id="about" @onclick="@((e) => OpenDialog(closeButton))">אודות</a>
-                <a>למשחק</a>
+                <a @onclick="takeme">למשחק</a>
             </span>
 
         </nav>
     </header>
 
 
-        </div>
+</div>
 
 @code {
     DialogOptions closeButton = new DialogOptions() { CloseButton = true };
-    DialogOptions maxWidth = new DialogOptions() { MaxWidth = MaxWidth.Medium,  CloseButton = true };
+    DialogOptions maxWidth = new DialogOptions() { MaxWidth = MaxWidth.Medium, CloseButton = true };
 
     private void OpenDialog(DialogOptions options)
     {
-        Dialog.Show<About>("",options);
+        Dialog.Show<About>("", options);
 
     }
 
@@ -33,5 +33,10 @@
     {
         Dialog.Show<HowToEdit>("", options);
 
+    }
+
+    void takeme()
+    {
+        nav.NavigateTo("./index");
     }
 }
