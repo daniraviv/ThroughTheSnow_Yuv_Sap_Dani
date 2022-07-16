@@ -2,12 +2,13 @@
 @inject HttpClient Http
 @inject IDialogService DialogService
 
-
-
 @*<MudContainer MaxWidth="MaxWidth.Large">*@
-    @*<MudPaper>*@
-    <section class="ton">
-        <h3>פריטים: @CorrOrNot </h3>
+@*<MudPaper>*@
+<div>
+    <h3>פריטים: @CorrOrNot (@itemnum())</h3>
+
+    <section class="grid-container">
+
 
         @foreach (Item i in ItemsToShow)
         {
@@ -16,12 +17,14 @@
 
                 if (i.ItemType == "text")
                 {
-                    <div id="itemcontent">@i.ItemContent  <MudIconButton Icon="@Icons.Filled.Close"  @onclick="() => OpenDialog(i)"></MudIconButton> <MudIconButton Icon="@Icons.Outlined.Edit" @onclick="() => EditItem(i)"></MudIconButton></div>
+                    <div id="itemcontent">@i.ItemContent  <MudIconButton Class="deletebtn" Icon="@Icons.Rounded.HighlightOff" @onclick="() => OpenDialog(i)"></MudIconButton> <MudIconButton Class="editbtn" Icon="@Icons.Outlined.Edit" @onclick="() => EditItem(i)"></MudIconButton></div>
+
                 }
 
                 if (i.ItemType == "Image")
                 {
-    <div class="itemcontent"> <img src="@i.ItemContent" width="150" /> <MudIconButton Icon="@Icons.Filled.Close" @onclick="() => OpenDialog(i)"></MudIconButton></div>
+                    <div id="imageContent"> <img src="@i.ItemContent" width="85" /> <MudIconButton Class="deletebtn" Icon="@Icons.Rounded.HighlightOff" @onclick="() => OpenDialog(i)"></MudIconButton></div>
+
                 }
 
 
@@ -31,12 +34,16 @@
         }
         @*</MudPaper>*@
     </section>
+</div>
 @*</MudContainer>*@
 
 <br />
 
 
 @code {
+
+
+
 
     [Parameter]
     public string CorrOrNot { get; set; }
@@ -54,6 +61,9 @@
 
     [Parameter]
     public EventCallback<Item> ItemPostCallBack { get; set; }
+
+
+
 
     async Task DeleteItem(Item ItemToDelete)
     {
@@ -101,4 +111,16 @@
         await ItemPostCallBack.InvokeAsync(ItemToUpdate);
 
     }
-    }
+
+    int itemnum()
+    {
+        int counter = 0;
+        @foreach (Item i in ItemsToShow)
+        {
+            if (i.GameID == gameid)
+            {
+                counter++;
+            }
+        }
+            return counter;
+        } }

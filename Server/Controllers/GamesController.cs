@@ -65,21 +65,7 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
         }
 
 
-        [HttpGet("playbyCode/{gameCode}")]
-        public async Task<IActionResult> GetGameByCode2(int gameCode)
-        {
-            Game gameToReturn = await _context.Games.FirstOrDefaultAsync(g => g.GameCode == gameCode);
-            if (gameToReturn != null)
-            {
-                if (gameToReturn.IsPublish == true)
-                {
-                    return Ok(gameToReturn.ID);
-                }
-                return BadRequest("game not published");
-            }
 
-            return BadRequest("No such game");
-        }
 
 
 
@@ -154,7 +140,11 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
 
         public async Task<IActionResult> UpdateWorker(Game GameToUpdate)
         {
-            Game GameFromDB = await _context.Games.FirstOrDefaultAsync(g => g.ID == GameToUpdate.ID);
+            string sessionContent = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(sessionContent) == false)
+            {
+                int SessionId = Convert.ToInt32(sessionContent);
+                Game GameFromDB = await _context.Games.FirstOrDefaultAsync(g => g.ID == GameToUpdate.ID);
             if (GameFromDB != null)
             {
                 GameFromDB.GameName = GameToUpdate.GameName;
@@ -173,6 +163,8 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
             }
 
 
+            }
+            return BadRequest("empty session");
         }
 
     }

@@ -3,323 +3,357 @@
 @inject HttpClient Http
 @inject NavigationManager nav
 
-<div class="plainBg">
+<NavBar></NavBar>
+<div class="plainBg" >
     @if (thisGame != null)
     {
 
 
-        <h3>שם המשחק:  @thisGame.GameName  </h3>
-        <h2>הוספת הנחייה</h2>
+        <h3 id="nameH">שם המשחק:  @thisGame.GameName  </h3>
+        <div id="whiteBlock2">
+            <h3 style="padding-right:6px">הוספת הנחייה</h3>
 
-        <MudTextField T="string" @bind-Value=thisGame.GameInstruction Counter="50" MaxLength="50" HelperText="תווים" Immediate="true" Validation="@(new Func<string, IEnumerable<string>>(MaxCharacters))" Variant="Variant.Text" />
+            <MudTextField Style="background-color: rgba(255, 255, 255, 0.4); width: 520px;border-radius:10px " T="string" @bind-Value=thisGame.GameInstruction Counter="50" MaxLength="50" HelperText="תווים" Immediate="true" Validation="@(new Func<string, IEnumerable<string>>(MaxCharacters))" Variant="Variant.Text" />
 
-        <MudButton Variant="Variant.Filled" Class="buttonGame" OnClick="CreateInstruction">הוספה</MudButton>
+            <MudButton  Style="position:relative; left:200px; bottom:60px;" Class="buttonGame" Disabled="@(canGiveInst(thisGame) ? false : true)" OnClick="CreateInstruction">הוספה</MudButton>
+        </div>
 
+    
         <EditForm Model="Newitem" OnSubmit="CreateItem">
 
+          
+            <div id="whiteBlock3">
+                <p style="font-weight:bold;font-size:22px;padding-right:5px ">יצירת פריטים לשאלה</p>
+                <br />
+                <p style="font-weight: bold; font-size: 22px; padding-right:5px">
+                    ערך הפריט
+                </p>
+                לא נכון <MudSwitch @bind-Checked="@isCorrect" @bind-value="Newitem.IsCorrect" Color="Color.Primary" /> נכון
+                <br />
+                <div id="QtextBlock">
+                    <MudTextField T="string" @bind-Value=ItemTxt Counter="40" MaxLength="40" HelperText="תווים" Immediate="true" Validation="@(new Func<string, IEnumerable<string>>(MaxCharacters2))" Variant="Variant.Text" />
+                </div>
+                <p style="font-size:80px; position:relative;bottom:120px;right:600px;color:snow">/</p>
 
-            <br />
-            יצירת פריטים לשאלה
-            <br /> ערך הפריט
-            לא נכון <MudSwitch @bind-Checked="@isCorrect" @bind-value="Newitem.IsCorrect" Color="Color.Primary" /> נכון
-            <br />
+                <MudIconButton Style="position:relative;right:650px;  bottom:200px;display:inline-grid" Icon="@Icons.Outlined.AddPhotoAlternate" Size="Size.Large" for="FileInputID" HtmlTag="label"></MudIconButton>
+
+                <div Style="position:relative;right:790px;  bottom:300px">
+                    <InputFile id="FileInputID" OnChange="UploadFile" hidden />     <img src="@myFileImage" width="150" />
+                </div>
 
 
-            <MudTextField T="string" @bind-Value=ItemTxt Counter="40" MaxLength="40" HelperText="תווים" Immediate="true" Validation="@(new Func<string, IEnumerable<string>>(MaxCharacters2))" Variant="Variant.Text" />
+                <MudButton Style="position:absolute; bottom:300px;right:200px " Disabled="@(canCreate(ItemTxt,myFileImage) ? false : true)" Class="buttonGame" OnClick="CreateItem">הוספה</MudButton>
 
 
-
-
-
-            <MudIconButton Icon="@Icons.Outlined.AddPhotoAlternate" for="FileInputID" HtmlTag="label"></MudIconButton>
-
-
-            <InputFile id="FileInputID" OnChange="UploadFile" hidden />     <img src="@myFileImage" width="150" />
-
-
-
-            <MudButton Variant="Variant.Filled" Class="buttonGame" OnClick="CreateItem">הוספה</MudButton>
-
-            @*<input type="submit" value="send" />*@
+            </div>
         </EditForm>
 
 
 
-
         <p>@msg</p>
-        <p>@err</p>
-        <CorrectOrNot CorrOrNot="נכונים" gameid="gameid" ItemsToShow="AllCorrItemsList" ItemCallBack="DeleteItemFromList" ItemPostCallBack="EditItemFromLIst" />
-        <CorrectOrNot CorrOrNot="לא נכונים" gameid="gameid" ItemsToShow="AllInCorrItemsList" ItemCallBack="DeleteItemFromList" ItemPostCallBack="EditItemFromLIst" />
-
-    }
-
-
-
-
-    <MudButton Variant="Variant.Filled" @onclick="() => BacktoGame(thisGame.UserID)">חזרה למשחקים שלי</MudButton>
-
-</div>
-
-@code {
-    [Parameter]
-    public int gameid { get; set; }
-
-    string ItemTxt = "";
-    string err = "";
-    string msg = "";
-    Game thisGame;
-    Item Newitem = new Item();
-    public bool isCorrect { get; set; } = true;
-    List<Item> AllItemsList = new List<Item>();
-    List<Item> AllCorrItemsList = new List<Item>();
-    List<Item> AllInCorrItemsList = new List<Item>();
-
-    List<Item> tryList= new List<Item>();
-
-    //bool canPublish = false;
-
-
-    Item itemToUpdate = null;
-
-    string myFileImage;
-    long maxFileSize = 4194304;
-
-
-    protected async override Task OnInitializedAsync()
-    {
-        var getResponse = await Http.GetAsync("api/Items/" + gameid);
-        var getResponse2 = await Http.GetAsync("api/Items/bycorr/" + true);
-        var getResponse3 = await Http.GetAsync("api/Items/bycorr/" + false);
-
-        if (getResponse.IsSuccessStatusCode == true)
-        {
-            thisGame = getResponse.Content.ReadFromJsonAsync<Game>().Result;
-            if (getResponse2.IsSuccessStatusCode == true)
-            {
-                AllCorrItemsList = getResponse2.Content.ReadFromJsonAsync<List<Item>>().Result;
-                AllInCorrItemsList = getResponse3.Content.ReadFromJsonAsync<List<Item>>().Result;
-
-
-            }
-        }
-
-        else
-        {
-            msg = "שגיאת רשת";
-        }
-    }
-
-
-
-
-    async Task CreateInstruction()
-
-    {
-        var UpdateResponse = await Http.PostAsJsonAsync("api/Games/Update", thisGame);
-        if (UpdateResponse.IsSuccessStatusCode == true)
-        {
-            Game UpdatedGame = UpdateResponse.Content.ReadFromJsonAsync<Game>().Result;
-
-            thisGame = UpdatedGame;
-
-        }
-    }
-
-
-
-
-    async Task CreateItem()
-    {
-        if (itemToUpdate == null)
-        {
-            Newitem.GameID = thisGame.ID;
-
-            if (ItemTxt != "")
-            {
-                Newitem.ItemType = "text";
-                Newitem.ItemContent = ItemTxt;
-            }
-            else
-            {
-                Newitem.ItemType = "Image";
-                Newitem.ItemContent = myFileImage;
+     
+        <section class="thisSection" style=" position: absolute;right:30px;bottom:-4px" >
+            <CorrectOrNot CorrOrNot="נכונים" gameid="gameid" ItemsToShow="AllCorrItemsList" ItemCallBack="DeleteItemFromList" ItemPostCallBack="EditItemFromLIst" />
+        </section>
+        <section class="thisSection" style=" position: absolute; right:640px; bottom:-4px" >
+            <CorrectOrNot CorrOrNot="לא נכונים"  gameid="gameid" ItemsToShow="AllInCorrItemsList" ItemCallBack="DeleteItemFromList" ItemPostCallBack="EditItemFromLIst" />
+        </section>
             }
 
-            if (isCorrect == true)
-            {
-                Newitem.IsCorrect = true;
-            }
-            else
-            {
-                Newitem.IsCorrect = false;
-            }
 
-            var postResponse = await Http.PostAsJsonAsync("api/Items/InsertItem", Newitem);
 
-            if (postResponse.IsSuccessStatusCode == true)
+
+            <MudButton Class="backbtn" @onclick="() => BacktoGame(thisGame.UserID)">חזרה למשחקים שלי</MudButton>
+
+            <div id="signCond"></div>
+    </div>
+
+        @code {
+            [Parameter]
+            public int gameid { get; set; }
+
+            string ItemTxt = "";
+         
+            string msg = "";
+            Game thisGame;
+            Item Newitem = new Item();
+            public bool isCorrect { get; set; } = true;
+            List<Item> AllItemsList = new List<Item>();
+            List<Item> AllCorrItemsList = new List<Item>();
+            List<Item> AllInCorrItemsList = new List<Item>();
+
+            List<Item> tryList = new List<Item>();
+           
+
+
+
+            Item itemToUpdate = null;
+
+            string myFileImage = "";
+            long maxFileSize = 4194304;
+
+
+            protected async override Task OnInitializedAsync()
             {
-                Item myNewItem = postResponse.Content.ReadFromJsonAsync<Item>().Result;
+                var getResponse = await Http.GetAsync("api/Items/" + gameid);
+                var getResponse2 = await Http.GetAsync("api/Items/bycorr/" + true);
+                var getResponse3 = await Http.GetAsync("api/Items/bycorr/" + false);
 
-               //tryList = thisGame.GameItems;
-                thisGame.GameItems.Add(myNewItem);
-                if (myNewItem.IsCorrect == true)
+                if (getResponse.IsSuccessStatusCode == true)
                 {
-                    AllCorrItemsList.Add(myNewItem);
+                    thisGame = getResponse.Content.ReadFromJsonAsync<Game>().Result;
+                    if (getResponse2.IsSuccessStatusCode == true)
+                    {
+                        AllCorrItemsList = getResponse2.Content.ReadFromJsonAsync<List<Item>>().Result;
+                        AllInCorrItemsList = getResponse3.Content.ReadFromJsonAsync<List<Item>>().Result;
+
+
+                    }
                 }
+
                 else
                 {
-                    AllInCorrItemsList.Add(myNewItem);
+                    msg = "שגיאת רשת";
                 }
-
-                Newitem = new Item();
-                ItemTxt = "";
-                myFileImage = "";
             }
-            else
-            {
-                msg = "תקלה";
-            }
-        }
-        else
-        {
-            bool wasCorr = itemToUpdate.IsCorrect;
 
-            itemToUpdate.IsCorrect = isCorrect;
-            itemToUpdate.ItemContent = ItemTxt;
 
-            var UpdateResponse = await Http.PostAsJsonAsync("api/Items/Update", itemToUpdate);
-            if (UpdateResponse.IsSuccessStatusCode == true)
+
+
+            async Task CreateInstruction()
+
             {
-                Item UpdatedItem = UpdateResponse.Content.ReadFromJsonAsync<Item>().Result;
-                //int IndexOfItem = AllItemsList.FindIndex(i => i.ID == ItemToUpdate.ID);
-                //AllItemsList[IndexOfItem] = ItemToUpdate;
-                if (itemToUpdate.IsCorrect != wasCorr)
+                var UpdateResponse = await Http.PostAsJsonAsync("api/Games/Update", thisGame);
+                if (UpdateResponse.IsSuccessStatusCode == true)
                 {
-                    if (itemToUpdate.IsCorrect == true)
+                    Game UpdatedGame = UpdateResponse.Content.ReadFromJsonAsync<Game>().Result;
+
+                    thisGame = UpdatedGame;
+
+                }
+            }
+
+
+
+
+            async Task CreateItem()
+            {
+                if (itemToUpdate == null)
+                {
+                    Newitem.GameID = thisGame.ID;
+
+                    if (ItemTxt != "")
                     {
-                        AllInCorrItemsList.Remove(itemToUpdate);
-                        AllCorrItemsList.Add(itemToUpdate);
+                        Newitem.ItemType = "text";
+                        Newitem.ItemContent = ItemTxt;
                     }
                     else
                     {
-                        AllCorrItemsList.Remove(itemToUpdate);
-                        AllInCorrItemsList.Add(itemToUpdate);
+                        Newitem.ItemType = "Image";
+                        Newitem.ItemContent = myFileImage;
+                    }
+
+                    if (isCorrect == true)
+                    {
+                        Newitem.IsCorrect = true;
+                    }
+                    else
+                    {
+                        Newitem.IsCorrect = false;
+                    }
+
+                    var postResponse = await Http.PostAsJsonAsync("api/Items/InsertItem", Newitem);
+
+                    if (postResponse.IsSuccessStatusCode == true)
+                    {
+                        Item myNewItem = postResponse.Content.ReadFromJsonAsync<Item>().Result;
+
+              
+                        thisGame.GameItems.Add(myNewItem);
+                        if (myNewItem.IsCorrect == true)
+                        {
+                            AllCorrItemsList.Add(myNewItem);
+                        }
+                        else
+                        {
+                            AllInCorrItemsList.Add(myNewItem);
+                        }
+
+                        Newitem = new Item();
+                        ItemTxt = "";
+                        myFileImage = "";
+                    }
+                    else
+                    {
+                        msg = "תקלה";
+                    }
+                }
+                else
+                {
+                    bool wasCorr = itemToUpdate.IsCorrect;
+
+                    itemToUpdate.IsCorrect = isCorrect;
+                    itemToUpdate.ItemContent = ItemTxt;
+
+                    var UpdateResponse = await Http.PostAsJsonAsync("api/Items/Update", itemToUpdate);
+                    if (UpdateResponse.IsSuccessStatusCode == true)
+                    {
+                        Item UpdatedItem = UpdateResponse.Content.ReadFromJsonAsync<Item>().Result;
+                    
+                        if (itemToUpdate.IsCorrect != wasCorr)
+                        {
+                            if (itemToUpdate.IsCorrect == true)
+                            {
+                                AllInCorrItemsList.Remove(itemToUpdate);
+                                AllCorrItemsList.Add(itemToUpdate);
+                            }
+                            else
+                            {
+                                AllCorrItemsList.Remove(itemToUpdate);
+                                AllInCorrItemsList.Add(itemToUpdate);
+
+                            }
+
+                        }
+                        ItemTxt = "";
+                        itemToUpdate = null;
+
+                    }
+
+                }
+
+
+
+            }
+
+
+
+
+
+
+            void DeleteItemFromList(Item ItemToDelete)
+            {
+                if (itemToUpdate != null)
+                {
+                    if (itemToUpdate.ID == ItemToDelete.ID)
+                    {
+                        itemToUpdate = null;
+                        ItemTxt = "";
 
                     }
                 }
 
+
+                if (ItemToDelete.IsCorrect == true)
+                {
+                    AllCorrItemsList.RemoveAll(i => i.ID == ItemToDelete.ID);
+                }
+                else
+                {
+                    AllInCorrItemsList.RemoveAll(i => i.ID == ItemToDelete.ID);
+                }
+   
+                AllItemsList.RemoveAll(i => i.ID == ItemToDelete.ID);
+                Newitem = new Item();
+
+
+
             }
 
-        }
 
 
 
-    }
-
-
-
-
-
-
-    void DeleteItemFromList(Item ItemToDelete)
-    {
-
-
-        if (ItemToDelete.IsCorrect == true)
-        {
-            AllCorrItemsList.RemoveAll(i => i.ID == ItemToDelete.ID);
-        }
-        else
-        {
-            AllInCorrItemsList.RemoveAll(i => i.ID == ItemToDelete.ID);
-        }
-        //thisGame.GameItems.RemoveAll(i => i.ID == ItemToDelete.ID);
-        AllItemsList.RemoveAll(i => i.ID == ItemToDelete.ID);
-        Newitem = new Item();
-
-    }
-
-
-
-
-    private async Task UploadFile(InputFileChangeEventArgs e)
-    {
-        var imageFiles = e.GetMultipleFiles();
-        foreach (var file in imageFiles)
-        {
-            if (file.Size <= maxFileSize)
+            private async Task UploadFile(InputFileChangeEventArgs e)
             {
-                var buffer = new byte[file.Size];
-                await file.OpenReadStream(maxFileSize).ReadAsync(buffer);
-                var imageBase64 = Convert.ToBase64String(buffer);
-                var saveResponse = await Http.PostAsJsonAsync("api/items/uploadImage", imageBase64);
-
-                if (saveResponse.IsSuccessStatusCode == true)
+                var imageFiles = e.GetMultipleFiles();
+                foreach (var file in imageFiles)
                 {
+                    if (file.Size <= maxFileSize)
+                    {
+                        var buffer = new byte[file.Size];
+                        await file.OpenReadStream(maxFileSize).ReadAsync(buffer);
+                        var imageBase64 = Convert.ToBase64String(buffer);
+                        var saveResponse = await Http.PostAsJsonAsync("api/items/uploadImage", imageBase64);
 
-                    string resizeUrl = saveResponse.Content.ReadAsStringAsync().Result;
-                    myFileImage = resizeUrl; //להכניס לפה את הפריט
-                    Console.WriteLine(resizeUrl);
+                        if (saveResponse.IsSuccessStatusCode == true)
+                        {
+
+                            string resizeUrl = saveResponse.Content.ReadAsStringAsync().Result;
+                            myFileImage = resizeUrl; //להכניס לפה את הפריט
+                            Console.WriteLine(resizeUrl);
+                        }
+                    }
                 }
             }
+
+
+            void EditItemFromLIst(Item ItemToUpdate)
+            {
+                //Newitem.ID = ItemToUpdate.ID;
+
+                ItemTxt = ItemToUpdate.ItemContent;
+                isCorrect = ItemToUpdate.IsCorrect;
+
+                itemToUpdate = ItemToUpdate;
+
+
+            }
+
+
+
+
+
+
+            private IEnumerable<string> MaxCharacters(string ch)
+            {
+                if (!string.IsNullOrEmpty(ch) && 50 == ch?.Length)
+                    yield return "";
+            }
+
+            private IEnumerable<string> MaxCharacters2(string ch)
+            {
+                if (!string.IsNullOrEmpty(ch) && 40 == ch?.Length)
+                    yield return "";
+            }
+
+
+            void BacktoGame(int UserId)
+            {
+
+
+                nav.NavigateTo("./Games/" + UserId);
+
+
+            }
+
+            bool canCreate(string thisItem, string myFileImage)
+            {
+
+
+
+                if (ItemTxt == "" && myFileImage =="")
+                {
+                    return false;
+                }
+
+
+                return true;
+            }
+            bool canGiveInst(Game GameInts)
+            {
+
+
+
+                if (GameInts.GameInstruction==null)
+                {
+                    return false;
+                }
+
+
+                return true;
+            }
+
         }
-    }
-
-
-    void EditItemFromLIst(Item ItemToUpdate)
-    {
-        //Newitem.ID = ItemToUpdate.ID;
-
-        ItemTxt = ItemToUpdate.ItemContent;
-        isCorrect = ItemToUpdate.IsCorrect;
-
-        itemToUpdate = ItemToUpdate;
-
-
-    }
-
-
-
-    //void SendForm()
-    //{
-    //    if (isCorrect == true)
-    //    {
-    //        msg = "תשובה נכונה";
-    //    }
-    //    else
-    //    {
-    //        msg = "לא נכון";
-    //    }
-    //}
-
-    void inValidForm()
-    {
-        err = "בעיה";
-    }
-
-    private IEnumerable<string> MaxCharacters(string ch)
-    {
-        if (!string.IsNullOrEmpty(ch) && 50 == ch?.Length)
-            yield return "";
-    }
-
-    private IEnumerable<string> MaxCharacters2(string ch)
-    {
-        if (!string.IsNullOrEmpty(ch) && 40 == ch?.Length)
-            yield return "";
-    }
-
-
-    void BacktoGame(int UserId)
-    {
-
-
-        nav.NavigateTo("./Games/" + UserId);
-
-
-    }
-
-}
 
 
 

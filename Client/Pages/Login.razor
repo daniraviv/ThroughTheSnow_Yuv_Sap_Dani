@@ -1,19 +1,28 @@
 ﻿@page "/"
 @inject HttpClient Http
 @inject NavigationManager nav
-   
- <div id="startBackG">
 
-     <div id="downDiv">
-         <h2 id="EmailTitle">הזינו כתובת מייל</h2>
-         
+<body>
+<NavBar></NavBar>
 
-         <MudTextField id="EmailAdress" @bind-Value="inputMail"Placeholder="כתובת מייל" DisableUnderLine="true"  ></MudTextField>
-         <MudButton Class="buttonGame" Variant="Variant.Filled" OnClick="loginUser">כניסה</MudButton>
-         <p>@msg</p>
+        <div id="startBackG" style="margin-top:80px">
 
-     </div>
-    </div>
+            <div id="downDiv">
+                <h2 id="EmailTitle">הזינו כתובת מייל</h2>
+
+
+                <MudTextField id="EmailAdress" @bind-Value="inputMail" Placeholder="כתובת מייל" DisableUnderLine="true"></MudTextField>
+                <br />
+
+                <MudButton Class="buttonGame" Variant="Variant.Filled" OnClick="loginUser">כניסה</MudButton>
+                <h3 class="ErrorTitle">@msg</h3>
+
+
+            </div>
+
+        </div>
+
+</body>
 
     @code
  { string inputMail = "";
@@ -24,9 +33,7 @@
         async Task loginUser()
         {
 
-            // תנאי שבודק האם המשתמש הזין מייל
-            // IsNullOrEmptyכשרוצים להשתמש ב
-            // תמיד נכתוב סוג משתנה סטרינג אם השמצנה עצמו לא מחרוזתי נמיר אותו לסטרינג בתוך הסוגריים
+
             if (string.IsNullOrEmpty(inputMail) == false)
             {
                 // קריאה לקוטרולר
@@ -44,13 +51,13 @@
 
                 else
                 {
-                    msg = "login failed";
+                    msg = "*משתמש לא קיים";
                 }
             }
 
             else
             {
-                msg = "יש להקליד כתובת מייל";
+                msg = "*יש להקליד כתובת מייל";
             }
 
 

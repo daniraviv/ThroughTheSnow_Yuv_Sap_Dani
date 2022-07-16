@@ -33,8 +33,13 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
         [HttpGet("{gameid}")]
         public async Task<IActionResult> GetGameByCode(int gameid)
         {
+            string sessionContent = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(sessionContent) == false)
+            {
+                int SessionId = Convert.ToInt32(sessionContent);
 
-            Game gameToReturn = await _context.Games.Include(g => g.GameItems).FirstOrDefaultAsync(g => g.ID == gameid);
+
+                Game gameToReturn = await _context.Games.Include(g => g.GameItems).FirstOrDefaultAsync(g => g.ID == gameid);
             if (gameToReturn != null)
             {
 
@@ -43,23 +48,11 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
 
             }
             return BadRequest("No such game");
-        }
-
-
-        [HttpGet("itemGame/{gameid}")]
-        public async Task<IActionResult> GetitemBygame(int gameid)
-        {
-
-            Item gameToReturn = await _context.Items.FirstOrDefaultAsync(g => g.ID == gameid);
-            if (gameToReturn != null)
-            {
-
-
-                return Ok(gameToReturn);
-
             }
-            return BadRequest("No such game");
+            return BadRequest("empty session");
         }
+
+
 
         [HttpPost("InsertItem")]
         public async Task<IActionResult> AddItem(Item newItem)
@@ -100,7 +93,11 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
     [HttpDelete("{id}")]
         public async Task<IActionResult> DeletItem(int id)
         {
-            Item ItemToDelete = await _context.Items.FirstOrDefaultAsync(i => i.ID == id);
+            string sessionContent = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(sessionContent) == false)
+            {
+                int SessionId = Convert.ToInt32(sessionContent);
+                Item ItemToDelete = await _context.Items.FirstOrDefaultAsync(i => i.ID == id);
             if (ItemToDelete != null)
             {
                 _context.Items.Remove(ItemToDelete);
@@ -111,6 +108,8 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
             {
                 return BadRequest("no such Item");
             }
+            }
+            return BadRequest("empty session");
         }
 
 
@@ -151,8 +150,25 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
         }
 
 
+        [HttpGet("GetGame/{gameid}")]
+        public async Task<IActionResult> GetGameByCodeIfPublish(int gameid)
+        {
+           
+
+                Game gameToReturn = await _context.Games.Include(g => g.GameItems).FirstOrDefaultAsync(g => g.ID == gameid);
+                if (gameToReturn != null)
+                {
+                if (gameToReturn.IsPublish == true)
+                {
+                    return Ok(gameToReturn);
+                }
+                return BadRequest("game not published");
+            }
+                return BadRequest("No such game");
+            }
+     }
 
 
 
     }
-}
+

@@ -3,65 +3,73 @@
 @inject HttpClient Http
 @inject NavigationManager nav
 @inject IDialogService DialogService
-
-
-<div class="BgWSign">
+    <NavBar></NavBar>
+<div class="BgWSign" style="margin-top:80px">
 
     @if (currentUser != null)
     {
-        //<h3>המשחקים של  @currentUser.FirstName </h3>
+       
         <br />
 
-        <h4>
-            משחק חדש:
-        </h4>
-        <div Class="whiteBlock">
-            <MudTextField T="string" @bind-Value="newGame.GameName" Counter="20" MaxLength="20" HelperText="תווים" Immediate="true" Validation="@(new Func<string, IEnumerable<string>>(MaxCharacters))" Variant="Variant.Text" DisableUnderLine="true" />
+        <div Class="inLinne">
+            <div>
+                <h3 style="margin-right:10px; margin-bottom:-30px;margin-bottom:10px"  >
+                    משחק חדש:
+                </h3>
+
+               
+                    <MudTextField  Style="background-color: rgba(255, 255, 255, 0.4); width: 230px;border-radius:10px; padding-right:3px;" T="string" @bind-Value="newGame.GameName" Counter="20" MaxLength="20" HelperText="תווים" Immediate="true" Validation="@(new Func<string, IEnumerable<string>>(MaxCharacters))" Variant="Variant.Text" DisableUnderLine="true" />
+               
+            </div>
         </div>
-        <br />
   
-        <MudButton Class="buttonGame2" Variant="Variant.Filled" OnClick="CreateGame">צור משחק</MudButton>
+  
+        <MudButton Style="display:inline-block; margin-right:10px" Class="buttonGame2 inLinne" Variant="Variant.Filled" Disabled="@(canGiveName(newGame) ? false : true)"  OnClick="CreateGame">צור משחק</MudButton>
 
         <br />
-        <MudTable Items="@currentUser.UserGames" Hover="true">
-            <HeaderContent>
-                <MudTh>שם המשחק</MudTh>
-                <MudTh>קוד המשחק</MudTh>
-                <MudTh>עריכה</MudTh>
-                <MudTh>מחיקה</MudTh>
-                <MudTh>פרסום המשחק</MudTh>
+    
+        <div >
+            <MudTable Items="@currentUser.UserGames" Style="        background-color: rgba(255, 255, 255, 0.3);
+        overflow-y: initial;
+        margin-top: 100px;"    >
+                <HeaderContent>
+                    <MudTh>שם המשחק</MudTh>
+                    <MudTh>קוד המשחק</MudTh>
+                    <MudTh>עריכה</MudTh>
+                    <MudTh>מחיקה</MudTh>
+                    <MudTh>פרסום המשחק</MudTh>
 
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="שם המשחק">@context.GameName</MudTd>
-                <MudTd DataLabel="קוד המשחק">@context.GameCode</MudTd>
-                <MudTd DataLabel="עריכה">
-                    <MudIconButton Icon="@Icons.Material.Outlined.Edit" @onclick="() => EditGamePage(context.GameCode)" />
-                </MudTd>
-                <MudTd DataLabel="מחיקה">
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" @onclick="() => OpenDialog(context.ID, context.GameName)" aria-label="delete"></MudIconButton>
-                </MudTd>
-                <MudTd DataLabel="פרסום המשחק">
-                    <MudCheckBox CheckedChanged="@((bool newState) => PublishGame(context))" Checked="@context.IsPublish" Color="Color.Primary" Disabled="@(canPublish(context)?false:true)"> </MudCheckBox>
-
-
-                </MudTd>
-            </RowTemplate>
-        </MudTable>
-
+                </HeaderContent>
+                <RowTemplate >
+                    <MudTd  DataLabel="שם המשחק">@context.GameName</MudTd>
+                    <MudTd  DataLabel="קוד המשחק">@context.GameCode</MudTd>
+                    <MudTd DataLabel="עריכה">
+                        <MudIconButton Icon="@Icons.Material.Outlined.Edit" @onclick="() => EditGamePage(context.GameCode)" />
+                    </MudTd>
+                    <MudTd DataLabel="מחיקה">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" @onclick="() => OpenDialog(context.ID, context.GameName)"></MudIconButton>
+                    </MudTd>
+                    <MudTd DataLabel="פרסום המשחק">
+                        <MudCheckBox CheckedChanged="@((bool newState) => PublishGame(context))" Checked="@context.IsPublish" Color="Color.Primary" Disabled="@(canPublish(context) ? false : true)"> </MudCheckBox>
 
 
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </div>
 
-        }
 
 
+    }
+
+    <p>@errormsg</p>
 </div>
 
 @code
 { [Parameter]
     public int userId { get; set; }
 
-
+    string errormsg = "";
 
     Game currentGame;
     User currentUser;
@@ -142,6 +150,15 @@
             currentUser.UserGames.RemoveAll(g => g.ID == gameToDeletId);
             currentGame = new Game();
         }
+        else
+        {
+            string error = DeleteResponse.Content.ReadAsStringAsync().Result;
+            if (error == "empty session")
+            {
+                nav.NavigateTo("./");
+                errormsg = "יש להתחבר מחדש";
+            }
+        }
     }
 
     async Task EditGamePage(int GameCode)
@@ -207,13 +224,35 @@
     }
 
 
-    void PublishGame(Game selectedGame)
+    async Task PublishGame(Game selectedGame)
     {
         selectedGame.IsPublish = !selectedGame.IsPublish;
+
+        var postResponse = await Http.PostAsJsonAsync("api/Games/Update", selectedGame);
+        if (postResponse.IsSuccessStatusCode == true)
+        {
+            Game myNewGame = postResponse.Content.ReadFromJsonAsync<Game>().Result;
+
+
+
+        }
+
     }
 
 
+    bool canGiveName(Game GameName)
+    {
 
 
 
-}
+        if (GameName.GameName == null)
+        {
+            return false;
+        }
+
+
+        return true;
+    }
+
+
+    }
