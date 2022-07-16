@@ -167,5 +167,7 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server.Controllers
             return BadRequest("empty session");
         }
 
+       
+
     }
 }
