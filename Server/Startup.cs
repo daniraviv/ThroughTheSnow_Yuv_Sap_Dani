@@ -66,6 +66,7 @@ namespace ThroughTheSnow_Yuv_Sap_Dani.Server
             app.UseSession();
 
             app.UseRouting();
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             app.UseEndpoints(endpoints =>
             {
